@@ -5,7 +5,7 @@ import LobbyScreen from './screens/LobbyScreen';
 import WaitingRoom from './screens/WaitingRoom';
 import GameScreen from './screens/GameScreen';
 import VictoryScreen from './screens/VictoryScreen';
-import AudioControls from './components/common/AudioControls';
+import SettingsPanel from './components/common/SettingsPanel';
 import SoundTriggers from './components/common/SoundTriggers';
 
 function AppContent() {
@@ -31,7 +31,7 @@ export default function App() {
       <GameProvider>
         <AudioProvider>
           <AppContent />
-          <AudioControls />
+          <SettingsPanel />
           <SoundTriggers />
         </AudioProvider>
       </GameProvider>

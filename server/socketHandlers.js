@@ -83,9 +83,9 @@ export function registerSocketHandlers(io) {
 
     // ---- ROOM EVENTS ----
 
-    socket.on(C2S.CREATE_ROOM, ({ playerName }) => {
+    socket.on(C2S.CREATE_ROOM, ({ playerName, sessionId }) => {
       try {
-        const { code, room } = roomManager.createRoom(socket.id, playerName);
+        const { code, room } = roomManager.createRoom(socket.id, playerName, sessionId);
         socket.join(code);
         socket.emit(S2C.ROOM_CREATED, {
           code,
@@ -97,10 +97,10 @@ export function registerSocketHandlers(io) {
       }
     });
 
-    socket.on(C2S.JOIN_ROOM, ({ code, playerName }) => {
+    socket.on(C2S.JOIN_ROOM, ({ code, playerName, sessionId }) => {
       try {
         const upperCode = code.toUpperCase();
-        const { room } = roomManager.joinRoom(upperCode, socket.id, playerName);
+        const { room } = roomManager.joinRoom(upperCode, socket.id, playerName, sessionId);
         socket.join(upperCode);
         socket.leave('lobby:browser');
         socket.emit(S2C.ROOM_JOINED, {
@@ -119,7 +119,11 @@ export function registerSocketHandlers(io) {
     socket.on(C2S.LEAVE_ROOM, () => {
       const found = roomManager.getRoomBySocket(socket.id);
       if (!found) return;
-      const { code } = found;
+      const { code, room: foundRoom } = found;
+      const player = foundRoom.players.find(p => p.id === socket.id);
+      if (player) {
+        roomManager.cancelDisconnectTimer(player.sessionId);
+      }
       const { room, isEmpty } = roomManager.leaveRoom(code, socket.id);
       socket.leave(code);
       if (!isEmpty && room) {
@@ -129,26 +133,30 @@ export function registerSocketHandlers(io) {
     });
 
     socket.on(C2S.START_GAME, () => {
-      const found = roomManager.getRoomBySocket(socket.id);
-      if (!found) return socket.emit(S2C.GAME_ERROR, { message: 'Not in a room' });
-      const { code, room } = found;
-      if (room.hostId !== socket.id) return socket.emit(S2C.GAME_ERROR, { message: 'Only host can start' });
-      if (room.players.length < 2) return socket.emit(S2C.GAME_ERROR, { message: 'Need at least 2 players' });
+      try {
+        const found = roomManager.getRoomBySocket(socket.id);
+        if (!found) return socket.emit(S2C.GAME_ERROR, { message: 'Not in a room' });
+        const { code, room } = found;
+        if (room.hostId !== socket.id) return socket.emit(S2C.GAME_ERROR, { message: 'Only host can start' });
+        if (room.players.length < 2) return socket.emit(S2C.GAME_ERROR, { message: 'Need at least 2 players' });
 
-      const gameState = gameEngine.createGame(room.players);
-      roomManager.setGameState(code, gameState);
-      broadcastGameState(io, code, gameState);
-      notifyLobbyBrowsers(io);
+        const gameState = gameEngine.createGame(room.players);
+        roomManager.setGameState(code, gameState);
+        broadcastGameState(io, code, gameState);
+        notifyLobbyBrowsers(io);
+      } catch (err) {
+        socket.emit(S2C.GAME_ERROR, { message: err.message });
+      }
     });
 
     // ---- PUBLIC ROOMS / LOBBY BROWSER ----
 
-    socket.on(C2S.CREATE_PUBLIC_ROOM, ({ playerName }) => {
+    socket.on(C2S.CREATE_PUBLIC_ROOM, ({ playerName, sessionId }) => {
       try {
         if (roomManager.getRoomBySocket(socket.id)) {
           return socket.emit(S2C.ROOM_ERROR, { message: 'Already in a room' });
         }
-        const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim());
+        const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim(), sessionId);
         socket.join(code);
         socket.leave('lobby:browser');
         socket.emit(S2C.ROOM_CREATED, {
@@ -173,7 +181,7 @@ export function registerSocketHandlers(io) {
       socket.leave('lobby:browser');
     });
 
-    socket.on(C2S.QUICK_PLAY, ({ playerName }) => {
+    socket.on(C2S.QUICK_PLAY, ({ playerName, sessionId }) => {
       try {
         if (!playerName || !playerName.trim()) {
           return socket.emit(S2C.ROOM_ERROR, { message: 'Player name is required' });
@@ -183,7 +191,7 @@ export function registerSocketHandlers(io) {
         }
         const available = roomManager.findAvailablePublicRoom();
         if (available) {
-          const { room } = roomManager.joinRoom(available.code, socket.id, playerName.trim());
+          const { room } = roomManager.joinRoom(available.code, socket.id, playerName.trim(), sessionId);
           socket.join(available.code);
           socket.leave('lobby:browser');
           socket.emit(S2C.ROOM_JOINED, {
@@ -196,7 +204,7 @@ export function registerSocketHandlers(io) {
           notifyLobbyBrowsers(io);
           autoStartIfFull(io, available.code);
         } else {
-          const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim());
+          const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim(), sessionId);
           socket.join(code);
           socket.leave('lobby:browser');
           socket.emit(S2C.ROOM_CREATED, {
@@ -210,6 +218,43 @@ export function registerSocketHandlers(io) {
       } catch (err) {
         socket.emit(S2C.ROOM_ERROR, { message: err.message });
       }
+    });
+
+    // ---- REJOIN ----
+
+    socket.on(C2S.REJOIN, ({ sessionId }) => {
+      if (!sessionId) return;
+      const result = roomManager.reconnectPlayer(sessionId, socket.id);
+      if (!result) return; // No session to rejoin
+
+      const { code, room } = result;
+      socket.join(code);
+      console.log(`Player reconnected: ${socket.id} (session: ${sessionId}) to room ${code}`);
+
+      if (room.gameState) {
+        // Game in progress — send game state
+        const sanitized = sanitizeStateForPlayer(room.gameState, socket.id);
+        socket.emit(S2C.REJOIN_SUCCESS, {
+          code,
+          playerId: socket.id,
+          players: room.players,
+          isPublic: room.isPublic || false,
+          gameState: sanitized
+        });
+      } else {
+        // Still in waiting room
+        socket.emit(S2C.REJOIN_SUCCESS, {
+          code,
+          playerId: socket.id,
+          players: room.players,
+          isPublic: room.isPublic || false,
+          gameState: null
+        });
+      }
+
+      // Notify other players
+      socket.to(code).emit(S2C.ROOM_UPDATED, { players: room.players });
+      notifyLobbyBrowsers(io);
     });
 
     // ---- GAME ACTIONS ----
@@ -377,15 +422,18 @@ export function registerSocketHandlers(io) {
 
     socket.on('disconnect', () => {
       console.log(`Player disconnected: ${socket.id}`);
-      const found = roomManager.getRoomBySocket(socket.id);
-      if (found) {
-        const { code } = found;
-        const { room, isEmpty } = roomManager.leaveRoom(code, socket.id);
+      const result = roomManager.markDisconnected(socket.id, (code, oldSocketId) => {
+        // This runs after 30s timeout if player doesn't reconnect
+        const { room, isEmpty } = roomManager.leaveRoom(code, oldSocketId);
         if (!isEmpty && room) {
           io.to(code).emit(S2C.ROOM_UPDATED, { players: room.players });
-          io.to(code).emit(S2C.PLAYER_LEFT, { playerId: socket.id });
+          io.to(code).emit(S2C.PLAYER_LEFT, { playerId: oldSocketId });
         }
         notifyLobbyBrowsers(io);
+      });
+      if (!result) {
+        // Player wasn't in a room, nothing to do
+        return;
       }
     });
   });

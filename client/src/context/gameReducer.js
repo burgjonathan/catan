@@ -43,6 +43,31 @@ export function gameReducer(state, action) {
     case 'ROOM_UPDATED':
       return { ...state, players: action.payload.players };
 
+    case 'REJOIN_SUCCESS': {
+      const p = action.payload;
+      if (p.gameState) {
+        return {
+          ...state,
+          screen: 'playing',
+          roomCode: p.code,
+          playerId: p.playerId,
+          players: p.players,
+          isPublic: p.isPublic || false,
+          gameState: p.gameState,
+          error: null
+        };
+      }
+      return {
+        ...state,
+        screen: 'waiting',
+        roomCode: p.code,
+        playerId: p.playerId,
+        players: p.players,
+        isPublic: p.isPublic || false,
+        error: null
+      };
+    }
+
     case 'ROOM_ERROR':
       return { ...state, error: action.payload.message };
 

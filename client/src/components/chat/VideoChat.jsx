@@ -1,4 +1,5 @@
 import { useGame } from '../../context/GameContext';
+import { useAudio } from '../../context/AudioContext';
 import { useWebRTC } from '../../hooks/useWebRTC';
 import VideoTile from './VideoTile';
 import './VideoChat.css';
@@ -6,6 +7,7 @@ import './VideoChat.css';
 export default function VideoChat() {
   const { state } = useGame();
   const { gameState, playerId, players } = state;
+  const { voiceChatMuted } = useAudio();
   const allPlayers = gameState?.players || players || [];
 
   const { streams, localStream, muted, videoOff, toggleMute, toggleVideo, startMedia, mediaStarted } = useWebRTC(
@@ -38,6 +40,7 @@ export default function VideoChat() {
               stream={streams[p.id]}
               name={p.name}
               color={p.color}
+              muted={voiceChatMuted}
             />
           ))}
       </div>

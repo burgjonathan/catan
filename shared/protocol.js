@@ -33,6 +33,8 @@ export const C2S = {
   STOP_BROWSING: 'lobby:stopBrowse',
   QUICK_PLAY: 'lobby:quickPlay',
 
+  REJOIN: 'room:rejoin',
+
   SIGNAL_OFFER: 'signal:offer',
   SIGNAL_ANSWER: 'signal:answer',
   SIGNAL_ICE: 'signal:ice',
@@ -61,6 +63,8 @@ export const S2C = {
   CHAT_MESSAGE: 'chat:message',
 
   PUBLIC_ROOM_LIST: 'lobby:roomList',
+
+  REJOIN_SUCCESS: 'room:rejoinSuccess',
 
   SIGNAL_OFFER: 'signal:offer',
   SIGNAL_ANSWER: 'signal:answer',

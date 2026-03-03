@@ -8,6 +8,8 @@ export function AudioProvider({ children }) {
   const [musicOn, setMusicOn] = useState(false);
   const [sfxOn, setSfxOn] = useState(true);
   const [musicVolume, setMusicVolumeState] = useState(0.5);
+  const [voiceChatMuted, setVoiceChatMuted] = useState(false);
+  const [chatMessagesMuted, setChatMessagesMuted] = useState(false);
   const sfxOnRef = useRef(sfxOn);
 
   useEffect(() => { sfxOnRef.current = sfxOn; }, [sfxOn]);
@@ -33,6 +35,16 @@ export function AudioProvider({ children }) {
   const changeMusicVolume = useCallback((vol) => {
     setMusicVolumeState(vol);
     setMusicVolume(vol);
+  }, []);
+
+  // Voice chat mute toggle
+  const toggleVoiceChatMute = useCallback(() => {
+    setVoiceChatMuted(prev => !prev);
+  }, []);
+
+  // Chat messages mute toggle
+  const toggleChatMessagesMute = useCallback(() => {
+    setChatMessagesMuted(prev => !prev);
   }, []);
 
   // Play a sound effect (respects sfxOn setting)
@@ -74,6 +86,10 @@ export function AudioProvider({ children }) {
       toggleSfx,
       changeMusicVolume,
       playSfx,
+      voiceChatMuted,
+      chatMessagesMuted,
+      toggleVoiceChatMute,
+      toggleChatMessagesMute,
     }}>
       {children}
     </AudioContext_.Provider>

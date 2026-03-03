@@ -5,7 +5,7 @@ import { useSocketContext } from '../context/SocketContext';
 import './LobbyScreen.css';
 
 export default function LobbyScreen() {
-  const [playerName, setPlayerName] = useState('');
+  const [playerName, setPlayerName] = useState(() => localStorage.getItem('catan_playerName') || '');
   const [roomCode, setRoomCode] = useState('');
   const [mode, setMode] = useState(null); // null, 'create', 'join'
   const actions = useGameActions();
@@ -22,18 +22,25 @@ export default function LobbyScreen() {
     }
   }, []);
 
+  const saveName = (name) => {
+    localStorage.setItem('catan_playerName', name);
+  };
+
   const handleCreate = () => {
     if (!playerName.trim()) return;
+    saveName(playerName.trim());
     actions.createRoom(playerName.trim());
   };
 
   const handleJoin = () => {
     if (!playerName.trim() || !roomCode.trim()) return;
+    saveName(playerName.trim());
     actions.joinRoom(roomCode.trim().toUpperCase(), playerName.trim());
   };
 
   const handleQuickPlay = () => {
     if (!playerName.trim()) return;
+    saveName(playerName.trim());
     actions.quickPlay(playerName.trim());
   };
 

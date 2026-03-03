@@ -1,18 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
 import { useGame } from '../../context/GameContext';
+import { useAudio } from '../../context/AudioContext';
 import { useGameActions } from '../../hooks/useGameActions';
 import './TextChat.css';
 
 export default function TextChat() {
   const { state } = useGame();
+  const { chatMessagesMuted } = useAudio();
   const actions = useGameActions();
   const [message, setMessage] = useState('');
   const scrollRef = useRef(null);
 
+  const currentPlayer = (state.gameState?.players || state.players || []).find(p => p.id === state.playerId);
+  const currentName = currentPlayer?.name;
+
   const messages = [
     ...(state.gameState?.gameLog || []).map(m => ({ ...m, isLog: true })),
     ...state.chatMessages.map(m => ({ ...m, isLog: false }))
-  ].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+  ]
+    .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+    .filter(m => !chatMessagesMuted || m.isLog || m.from === currentName);
 
   useEffect(() => {
     if (scrollRef.current) {

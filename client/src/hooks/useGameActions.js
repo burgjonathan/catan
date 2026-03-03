@@ -3,17 +3,20 @@ import { useGame } from '../context/GameContext';
 import { C2S } from 'shared/protocol.js';
 
 export function useGameActions() {
-  const { socket } = useSocketContext();
+  const { socket, sessionId } = useSocketContext();
   const { dispatch } = useGame();
 
   return {
-    createRoom: (playerName) => socket?.emit(C2S.CREATE_ROOM, { playerName }),
-    joinRoom: (code, playerName) => socket?.emit(C2S.JOIN_ROOM, { code, playerName }),
-    leaveRoom: () => socket?.emit(C2S.LEAVE_ROOM),
+    createRoom: (playerName) => socket?.emit(C2S.CREATE_ROOM, { playerName, sessionId }),
+    joinRoom: (code, playerName) => socket?.emit(C2S.JOIN_ROOM, { code, playerName, sessionId }),
+    leaveRoom: () => {
+      socket?.emit(C2S.LEAVE_ROOM);
+      dispatch({ type: 'RESET' });
+    },
     startGame: () => socket?.emit(C2S.START_GAME),
 
-    createPublicRoom: (playerName) => socket?.emit(C2S.CREATE_PUBLIC_ROOM, { playerName }),
-    quickPlay: (playerName) => socket?.emit(C2S.QUICK_PLAY, { playerName }),
+    createPublicRoom: (playerName) => socket?.emit(C2S.CREATE_PUBLIC_ROOM, { playerName, sessionId }),
+    quickPlay: (playerName) => socket?.emit(C2S.QUICK_PLAY, { playerName, sessionId }),
 
     rollDice: () => socket?.emit(C2S.ROLL_DICE),
     buildSettlement: (vertexKey) => socket?.emit(C2S.BUILD_SETTLEMENT, { vertexKey }),
