@@ -159,3 +159,22 @@
   font-size: 12px;
   letter-spacing: 2px;
 }
+
+.lobby-tutorial-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+
+.lobby-tutorial-btn:hover {
+  color: #f39c12;
+  border-color: rgba(243, 156, 18, 0.4);
+  background: rgba(243, 156, 18, 0.08);
+}

@@ -14,6 +14,7 @@ export const initialState = {
   mustDiscard: false,
   tradeOffer: null,
   winner: null,
+  tutorialMode: false,
 };
 
 export function gameReducer(state, action) {
@@ -117,6 +118,16 @@ export function gameReducer(state, action) {
 
     case 'SET_PLAYER_NAME':
       return { ...state, playerName: action.payload };
+
+    case 'START_TUTORIAL':
+      return {
+        ...state,
+        screen: 'playing',
+        tutorialMode: true,
+        playerId: action.payload.playerId,
+        gameState: action.payload.gameState,
+        error: null,
+      };
 
     case 'RESET':
       return { ...initialState };

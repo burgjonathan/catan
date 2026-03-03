@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
+import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
+import { useGame } from '../../context/GameContext';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 
 const TutorialContext = createContext(null);
@@ -35,6 +36,9 @@ function tutorialReducer(state, action) {
 
 export function TutorialProvider({ children }) {
   const [state, dispatch] = useReducer(tutorialReducer, initialState);
+  const { state: gameState, dispatch: gameDispatch } = useGame();
+  const tutorialMode = gameState.tutorialMode;
+  const prevActiveRef = useRef(false);
 
   const startTutorial = useCallback(() => dispatch({ type: 'START' }), []);
   const nextStep = useCallback(() => dispatch({ type: 'NEXT' }), []);
@@ -42,15 +46,28 @@ export function TutorialProvider({ children }) {
   const skipTutorial = useCallback(() => dispatch({ type: 'SKIP' }), []);
   const goToStep = useCallback((i) => dispatch({ type: 'GO_TO', payload: i }), []);
 
-  // Auto-start on first visit
+  // Auto-start tutorial
   useEffect(() => {
-    const completed = localStorage.getItem(STORAGE_KEY);
-    if (!completed) {
-      // Small delay so the game UI renders first
+    if (tutorialMode) {
+      // Always start in tutorial mode
       const timer = setTimeout(() => dispatch({ type: 'START' }), 800);
       return () => clearTimeout(timer);
     }
-  }, []);
+    // Normal mode: auto-start on first visit
+    const completed = localStorage.getItem(STORAGE_KEY);
+    if (!completed) {
+      const timer = setTimeout(() => dispatch({ type: 'START' }), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [tutorialMode]);
+
+  // Return to lobby when tutorial ends in tutorial mode
+  useEffect(() => {
+    if (tutorialMode && prevActiveRef.current && !state.active) {
+      gameDispatch({ type: 'RESET' });
+    }
+    prevActiveRef.current = state.active;
+  }, [state.active, tutorialMode, gameDispatch]);
 
   const currentStep = state.active ? state.steps[state.stepIndex] : null;
 

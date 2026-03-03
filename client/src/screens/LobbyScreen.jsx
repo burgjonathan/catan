@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useGameActions } from '../hooks/useGameActions';
 import { useGame } from '../context/GameContext';
 import { useSocketContext } from '../context/SocketContext';
+import { generateDemoGameState, TUTORIAL_PLAYER_ID } from '../utils/demoGameState';
 import './LobbyScreen.css';
 
 export default function LobbyScreen() {
@@ -9,8 +10,16 @@ export default function LobbyScreen() {
   const [roomCode, setRoomCode] = useState('');
   const [mode, setMode] = useState(null); // null, 'create', 'join'
   const actions = useGameActions();
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const { connected } = useSocketContext();
+
+  const handleTutorial = () => {
+    const gameState = generateDemoGameState();
+    dispatch({
+      type: 'START_TUTORIAL',
+      payload: { playerId: TUTORIAL_PLAYER_ID, gameState },
+    });
+  };
 
   // Check URL for room code
   useEffect(() => {
@@ -149,6 +158,9 @@ export default function LobbyScreen() {
         )}
 
         <div className="lobby-footer">
+          <button className="lobby-tutorial-btn" onClick={handleTutorial}>
+            How to Play
+          </button>
           <p>2-4 Players</p>
         </div>
       </div>

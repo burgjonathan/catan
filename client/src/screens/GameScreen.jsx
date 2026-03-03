@@ -50,9 +50,25 @@ function LeaveGameButton() {
   );
 }
 
+function ExitTutorialButton() {
+  const { dispatch } = useGame();
+  return (
+    <div className="leave-game-wrap">
+      <button className="leave-game-btn" onClick={() => dispatch({ type: 'RESET' })} title="Back to Menu">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        Exit Tutorial
+      </button>
+    </div>
+  );
+}
+
 export default function GameScreen() {
   const { state } = useGame();
-  const { gameState, playerId } = state;
+  const { gameState, playerId, tutorialMode } = state;
 
   if (!gameState) return <div className="loading">Loading game...</div>;
 
@@ -67,10 +83,12 @@ export default function GameScreen() {
         <ScoreBoard />
         <OpponentBar />
         <div className="game-middle">
-          <div className="game-sidebar-left">
-            <VideoChat />
-            <TextChat />
-          </div>
+          {!tutorialMode && (
+            <div className="game-sidebar-left">
+              <VideoChat />
+              <TextChat />
+            </div>
+          )}
           <div className="game-board-area">
             <Board />
           </div>
@@ -80,17 +98,17 @@ export default function GameScreen() {
         </div>
         <PlayerPanel />
 
-        {showDiscard && <DiscardModal player={myPlayer} />}
-        {showSteal && <StealModal targets={gameState.stealTargets} players={gameState.players} />}
+        {!tutorialMode && showDiscard && <DiscardModal player={myPlayer} />}
+        {!tutorialMode && showSteal && <StealModal targets={gameState.stealTargets} players={gameState.players} />}
 
-        {state.error && (
+        {!tutorialMode && state.error && (
           <div className="game-error-toast" onClick={() => state.dispatch?.({ type: 'CLEAR_ERROR' })}>
             {state.error}
           </div>
         )}
 
-        <LeaveGameButton />
-        <HelpButton />
+        {tutorialMode ? <ExitTutorialButton /> : <LeaveGameButton />}
+        {!tutorialMode && <HelpButton />}
         <TutorialOverlay />
       </div>
     </TutorialProvider>
