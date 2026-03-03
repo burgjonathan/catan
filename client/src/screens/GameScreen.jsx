@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useGame } from '../context/GameContext';
+import { useGameActions } from '../hooks/useGameActions';
 import Board from '../components/board/Board';
 import PlayerPanel from '../components/hud/PlayerPanel';
 import ScoreBoard from '../components/hud/ScoreBoard';
@@ -18,6 +20,31 @@ function HelpButton() {
   return (
     <button className="tutorial-help-btn" onClick={startTutorial} title="Game Tutorial">
       ?
+    </button>
+  );
+}
+
+function LeaveGameButton() {
+  const [confirming, setConfirming] = useState(false);
+  const actions = useGameActions();
+
+  if (confirming) {
+    return (
+      <div className="leave-game-confirm">
+        <span>Leave game?</span>
+        <button className="btn btn-danger btn-sm" onClick={() => actions.leaveRoom()}>Yes</button>
+        <button className="btn btn-secondary btn-sm" onClick={() => setConfirming(false)}>No</button>
+      </div>
+    );
+  }
+
+  return (
+    <button className="leave-game-btn" onClick={() => setConfirming(true)} title="Leave Game">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" y1="12" x2="9" y2="12" />
+      </svg>
     </button>
   );
 }
@@ -61,6 +88,7 @@ export default function GameScreen() {
           </div>
         )}
 
+        <LeaveGameButton />
         <HelpButton />
         <TutorialOverlay />
       </div>
