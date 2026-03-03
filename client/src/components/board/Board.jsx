@@ -119,6 +119,46 @@ export default function Board() {
     isPanning.current = false;
   }, []);
 
+  // Touch handlers for mobile pan/zoom
+  const touchStartRef = useRef(null);
+  const pinchStartDist = useRef(null);
+  const pinchStartZoom = useRef(1);
+
+  const handleTouchStart = useCallback((e) => {
+    if (e.touches.length === 2) {
+      // Pinch zoom start
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchStartDist.current = Math.hypot(dx, dy);
+      pinchStartZoom.current = zoom;
+      touchStartRef.current = null;
+    } else if (e.touches.length === 1) {
+      touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      panOrigin.current = { ...pan };
+    }
+  }, [zoom, pan]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (e.touches.length === 2 && pinchStartDist.current) {
+      // Pinch zoom
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const scale = dist / pinchStartDist.current;
+      setZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pinchStartZoom.current * scale)));
+    } else if (e.touches.length === 1 && touchStartRef.current && isPanning.current) {
+      // Single finger pan (only when panning mode active)
+      const dx = e.touches[0].clientX - touchStartRef.current.x;
+      const dy = e.touches[0].clientY - touchStartRef.current.y;
+      setPan({ x: panOrigin.current.x + dx, y: panOrigin.current.y + dy });
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    touchStartRef.current = null;
+    pinchStartDist.current = null;
+  }, []);
+
   const handleResetView = useCallback(() => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
@@ -194,6 +234,9 @@ export default function Board() {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <svg
         viewBox={`${vb.x} ${vb.y} ${vb.width} ${vb.height}`}

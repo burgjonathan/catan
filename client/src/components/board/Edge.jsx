@@ -31,16 +31,24 @@ export default function Edge({ edgeKey, p1, p2, owner, clickable, onClick }) {
   }
   if (clickable) {
     return (
-      <line
-        x1={p1.x} y1={p1.y}
-        x2={p2.x} y2={p2.y}
-        stroke="rgba(255,255,255,0.4)"
-        strokeWidth="6"
-        strokeLinecap="round"
-        cursor="pointer"
-        onClick={onClick}
-        className="edge-spot"
-      />
+      <g cursor="pointer" onClick={onClick}>
+        {/* Invisible larger hit area for mobile */}
+        <line
+          x1={p1.x} y1={p1.y}
+          x2={p2.x} y2={p2.y}
+          stroke="transparent"
+          strokeWidth="22"
+          strokeLinecap="round"
+        />
+        <line
+          x1={p1.x} y1={p1.y}
+          x2={p2.x} y2={p2.y}
+          stroke="rgba(255,255,255,0.4)"
+          strokeWidth="6"
+          strokeLinecap="round"
+          className="edge-spot"
+        />
+      </g>
     );
   }
   return null;

@@ -59,7 +59,11 @@ function DevCardDetail({ type, canPlay, onUse, onClose }) {
       </div>
       <p className="dev-card-detail-desc">{info.description}</p>
       <div className="dev-card-detail-actions">
-        {!isVP && (
+        {isVP ? (
+          <div className="dev-vp-notice" style={{ color: '#f1c40f', fontSize: '13px', fontWeight: 600 }}>
+            Already counted in your score
+          </div>
+        ) : (
           <button
             className="btn btn-primary dev-use-btn"
             disabled={!canPlay}

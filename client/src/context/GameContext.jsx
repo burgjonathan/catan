@@ -16,7 +16,6 @@ export function GameProvider({ children }) {
       [S2C.ROOM_CREATED]: (data) => dispatch({ type: 'ROOM_CREATED', payload: data }),
       [S2C.ROOM_JOINED]: (data) => dispatch({ type: 'ROOM_JOINED', payload: data }),
       [S2C.ROOM_UPDATED]: (data) => dispatch({ type: 'ROOM_UPDATED', payload: data }),
-      [S2C.REJOIN_SUCCESS]: (data) => dispatch({ type: 'REJOIN_SUCCESS', payload: data }),
       [S2C.ROOM_ERROR]: (data) => dispatch({ type: 'ROOM_ERROR', payload: data }),
       [S2C.GAME_STATE]: (data) => dispatch({ type: 'GAME_STATE', payload: data }),
       [S2C.GAME_ERROR]: (data) => dispatch({ type: 'GAME_ERROR', payload: data }),
@@ -34,8 +33,8 @@ export function GameProvider({ children }) {
     }
 
     return () => {
-      for (const event of Object.keys(handlers)) {
-        socket.off(event);
+      for (const [event, handler] of Object.entries(handlers)) {
+        socket.off(event, handler);
       }
     };
   }, [socket]);

@@ -6,6 +6,9 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .board-svg {

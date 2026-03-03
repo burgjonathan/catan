@@ -10,6 +10,8 @@ export default function Vertex({ vertexKey, pos, building, owner, clickable, onC
       // Render settlement with a clickable overlay (for upgrading to city)
       return (
         <g cursor="pointer" onClick={onClick}>
+          {/* Invisible larger hit area for mobile */}
+          <circle cx={pos.x} cy={pos.y} r={22} fill="transparent" />
           <Settlement x={pos.x} y={pos.y} color={owner} />
           <circle
             cx={pos.x}
@@ -28,17 +30,19 @@ export default function Vertex({ vertexKey, pos, building, owner, clickable, onC
   }
   if (clickable) {
     return (
-      <circle
-        cx={pos.x}
-        cy={pos.y}
-        r={8}
-        fill="rgba(255,255,255,0.5)"
-        stroke="#fff"
-        strokeWidth="2"
-        className="vertex-spot"
-        cursor="pointer"
-        onClick={onClick}
-      />
+      <g cursor="pointer" onClick={onClick}>
+        {/* Invisible larger hit area for mobile */}
+        <circle cx={pos.x} cy={pos.y} r={22} fill="transparent" />
+        <circle
+          cx={pos.x}
+          cy={pos.y}
+          r={8}
+          fill="rgba(255,255,255,0.5)"
+          stroke="#fff"
+          strokeWidth="2"
+          className="vertex-spot"
+        />
+      </g>
     );
   }
   return null;
