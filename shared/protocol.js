@@ -28,6 +28,11 @@ export const C2S = {
 
   CHAT_MESSAGE: 'chat:message',
 
+  CREATE_PUBLIC_ROOM: 'room:createPublic',
+  BROWSE_ROOMS: 'lobby:browse',
+  STOP_BROWSING: 'lobby:stopBrowse',
+  QUICK_PLAY: 'lobby:quickPlay',
+
   SIGNAL_OFFER: 'signal:offer',
   SIGNAL_ANSWER: 'signal:answer',
   SIGNAL_ICE: 'signal:ice',
@@ -54,6 +59,8 @@ export const S2C = {
   TRADE_RESOLVED: 'game:tradeResolved',
 
   CHAT_MESSAGE: 'chat:message',
+
+  PUBLIC_ROOM_LIST: 'lobby:roomList',
 
   SIGNAL_OFFER: 'signal:offer',
   SIGNAL_ANSWER: 'signal:answer',

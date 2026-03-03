@@ -131,6 +131,45 @@
   font-size: 14px;
 }
 
+.lobby-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.lobby-divider::before,
+.lobby-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.lobby-browse-btn {
+  width: 100%;
+}
+
+.public-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  user-select: none;
+}
+
+.public-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #f39c12;
+  cursor: pointer;
+}
+
 .lobby-footer {
   margin-top: 36px;
   color: rgba(255, 255, 255, 0.3);

@@ -12,6 +12,9 @@ export function useGameActions() {
     leaveRoom: () => socket?.emit(C2S.LEAVE_ROOM),
     startGame: () => socket?.emit(C2S.START_GAME),
 
+    createPublicRoom: (playerName, roomName) => socket?.emit(C2S.CREATE_PUBLIC_ROOM, { playerName, roomName }),
+    quickPlay: (playerName) => socket?.emit(C2S.QUICK_PLAY, { playerName }),
+
     rollDice: () => socket?.emit(C2S.ROLL_DICE),
     buildSettlement: (vertexKey) => socket?.emit(C2S.BUILD_SETTLEMENT, { vertexKey }),
     buildCity: (vertexKey) => socket?.emit(C2S.BUILD_CITY, { vertexKey }),

@@ -63,6 +63,11 @@ function handleGameAction(io, socket, roomCode, actionFn) {
   }
 }
 
+function notifyLobbyBrowsers(io) {
+  const rooms = roomManager.getPublicRooms();
+  io.to('lobby:browser').emit(S2C.PUBLIC_ROOM_LIST, { rooms });
+}
+
 export function registerSocketHandlers(io) {
   io.on('connection', (socket) => {
     console.log(`Player connected: ${socket.id}`);
@@ -87,12 +92,14 @@ export function registerSocketHandlers(io) {
       try {
         const { room } = roomManager.joinRoom(code.toUpperCase(), socket.id, playerName);
         socket.join(code.toUpperCase());
+        socket.leave('lobby:browser');
         socket.emit(S2C.ROOM_JOINED, {
           code: code.toUpperCase(),
           playerId: socket.id,
           players: room.players
         });
         socket.to(code.toUpperCase()).emit(S2C.ROOM_UPDATED, { players: room.players });
+        notifyLobbyBrowsers(io);
       } catch (err) {
         socket.emit(S2C.ROOM_ERROR, { message: err.message });
       }
@@ -107,6 +114,7 @@ export function registerSocketHandlers(io) {
       if (!isEmpty && room) {
         io.to(code).emit(S2C.ROOM_UPDATED, { players: room.players });
       }
+      notifyLobbyBrowsers(io);
     });
 
     socket.on(C2S.START_GAME, () => {
@@ -119,6 +127,81 @@ export function registerSocketHandlers(io) {
       const gameState = gameEngine.createGame(room.players);
       roomManager.setGameState(code, gameState);
       broadcastGameState(io, code, gameState);
+      notifyLobbyBrowsers(io);
+    });
+
+    // ---- PUBLIC ROOMS / LOBBY BROWSER ----
+
+    socket.on(C2S.CREATE_PUBLIC_ROOM, ({ playerName, roomName }) => {
+      try {
+        if (!roomName || !roomName.trim()) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'Room name is required' });
+        }
+        if (roomName.trim().length > 30) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'Room name too long (max 30 chars)' });
+        }
+        if (roomManager.getRoomBySocket(socket.id)) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'Already in a room' });
+        }
+        const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim(), roomName.trim());
+        socket.join(code);
+        socket.leave('lobby:browser');
+        socket.emit(S2C.ROOM_CREATED, {
+          code,
+          playerId: socket.id,
+          players: room.players
+        });
+        notifyLobbyBrowsers(io);
+      } catch (err) {
+        socket.emit(S2C.ROOM_ERROR, { message: err.message });
+      }
+    });
+
+    socket.on(C2S.BROWSE_ROOMS, () => {
+      socket.join('lobby:browser');
+      const rooms = roomManager.getPublicRooms();
+      socket.emit(S2C.PUBLIC_ROOM_LIST, { rooms });
+    });
+
+    socket.on(C2S.STOP_BROWSING, () => {
+      socket.leave('lobby:browser');
+    });
+
+    socket.on(C2S.QUICK_PLAY, ({ playerName }) => {
+      try {
+        if (!playerName || !playerName.trim()) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'Player name is required' });
+        }
+        if (roomManager.getRoomBySocket(socket.id)) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'Already in a room' });
+        }
+        const available = roomManager.findAvailablePublicRoom();
+        if (available) {
+          const { room } = roomManager.joinRoom(available.code, socket.id, playerName.trim());
+          socket.join(available.code);
+          socket.leave('lobby:browser');
+          socket.emit(S2C.ROOM_JOINED, {
+            code: available.code,
+            playerId: socket.id,
+            players: room.players
+          });
+          socket.to(available.code).emit(S2C.ROOM_UPDATED, { players: room.players });
+          notifyLobbyBrowsers(io);
+        } else {
+          const roomName = `${playerName.trim()}'s Game`;
+          const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim(), roomName);
+          socket.join(code);
+          socket.leave('lobby:browser');
+          socket.emit(S2C.ROOM_CREATED, {
+            code,
+            playerId: socket.id,
+            players: room.players
+          });
+          notifyLobbyBrowsers(io);
+        }
+      } catch (err) {
+        socket.emit(S2C.ROOM_ERROR, { message: err.message });
+      }
     });
 
     // ---- GAME ACTIONS ----
@@ -294,6 +377,7 @@ export function registerSocketHandlers(io) {
           io.to(code).emit(S2C.ROOM_UPDATED, { players: room.players });
           io.to(code).emit(S2C.PLAYER_LEFT, { playerId: socket.id });
         }
+        notifyLobbyBrowsers(io);
       }
     });
   });

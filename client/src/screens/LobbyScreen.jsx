@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { useGameActions } from '../hooks/useGameActions';
 import { useGame } from '../context/GameContext';
 import { useSocketContext } from '../context/SocketContext';
+import RoomBrowser from './RoomBrowser';
 import './LobbyScreen.css';
 
 export default function LobbyScreen() {
   const [playerName, setPlayerName] = useState('');
   const [roomCode, setRoomCode] = useState('');
-  const [mode, setMode] = useState(null); // null, 'create', 'join'
+  const [mode, setMode] = useState(null); // null, 'create', 'join', 'browse'
+  const [isPublic, setIsPublic] = useState(false);
+  const [roomName, setRoomName] = useState('');
   const actions = useGameActions();
   const { state } = useGame();
   const { connected } = useSocketContext();
@@ -24,13 +27,22 @@ export default function LobbyScreen() {
 
   const handleCreate = () => {
     if (!playerName.trim()) return;
-    actions.createRoom(playerName.trim());
+    if (isPublic) {
+      if (!roomName.trim()) return;
+      actions.createPublicRoom(playerName.trim(), roomName.trim());
+    } else {
+      actions.createRoom(playerName.trim());
+    }
   };
 
   const handleJoin = () => {
     if (!playerName.trim() || !roomCode.trim()) return;
     actions.joinRoom(roomCode.trim().toUpperCase(), playerName.trim());
   };
+
+  if (mode === 'browse' && connected) {
+    return <RoomBrowser playerName={playerName.trim()} onBack={() => setMode(null)} />;
+  }
 
   return (
     <div className="lobby-screen">
@@ -70,9 +82,15 @@ export default function LobbyScreen() {
                 Create Room
               </button>
               <button className="btn btn-secondary lobby-btn" onClick={() => playerName.trim() && setMode('join')} disabled={!playerName.trim()}>
-                Join Room
+                Join by Code
               </button>
             </div>
+            <div className="lobby-divider">
+              <span>OR</span>
+            </div>
+            <button className="btn btn-primary lobby-btn lobby-browse-btn" onClick={() => playerName.trim() && setMode('browse')} disabled={!playerName.trim()}>
+              Browse Public Games
+            </button>
           </div>
         )}
 
@@ -88,7 +106,31 @@ export default function LobbyScreen() {
                 maxLength={20}
               />
             </div>
-            <button className="btn btn-primary lobby-btn" onClick={handleCreate} disabled={!playerName.trim()}>
+            <label className="public-toggle">
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={e => setIsPublic(e.target.checked)}
+              />
+              <span>Public room (visible to all players)</span>
+            </label>
+            {isPublic && (
+              <div className="lobby-name-input">
+                <label>Room Name</label>
+                <input
+                  type="text"
+                  value={roomName}
+                  onChange={e => setRoomName(e.target.value)}
+                  placeholder="e.g. Beginners Welcome"
+                  maxLength={30}
+                />
+              </div>
+            )}
+            <button
+              className="btn btn-primary lobby-btn"
+              onClick={handleCreate}
+              disabled={!playerName.trim() || (isPublic && !roomName.trim())}
+            >
               Create New Game
             </button>
             <button className="btn btn-secondary lobby-btn" onClick={() => setMode(null)}>

@@ -33,6 +33,54 @@ export function createRoom(hostSocketId, hostName) {
   return { code, room };
 }
 
+export function createPublicRoom(hostSocketId, hostName, roomName) {
+  const code = generateCode();
+  const room = {
+    code,
+    name: roomName,
+    isPublic: true,
+    players: [{
+      id: hostSocketId,
+      name: hostName,
+      color: PLAYER_COLORS[0],
+      colorName: PLAYER_COLOR_NAMES[0],
+      isHost: true
+    }],
+    hostId: hostSocketId,
+    gameState: null,
+    status: 'waiting',
+    createdAt: Date.now()
+  };
+  rooms.set(code, room);
+  return { code, room };
+}
+
+export function getPublicRooms() {
+  const publicRooms = [];
+  for (const [code, room] of rooms) {
+    if (room.isPublic && room.status === 'waiting' && room.players.length < 4) {
+      publicRooms.push({
+        code,
+        name: room.name,
+        hostName: room.players.find(p => p.isHost)?.name || 'Unknown',
+        playerCount: room.players.length,
+        maxPlayers: 4,
+        createdAt: room.createdAt
+      });
+    }
+  }
+  return publicRooms.sort((a, b) => b.createdAt - a.createdAt);
+}
+
+export function findAvailablePublicRoom() {
+  for (const [code, room] of rooms) {
+    if (room.isPublic && room.status === 'waiting' && room.players.length < 4) {
+      return { code, room };
+    }
+  }
+  return null;
+}
+
 export function joinRoom(code, socketId, playerName) {
   const room = rooms.get(code);
   if (!room) throw new Error('Room not found');
