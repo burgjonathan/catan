@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSocketContext } from '../context/SocketContext';
 import { useGameActions } from '../hooks/useGameActions';
 import { useGame } from '../context/GameContext';
@@ -6,8 +6,9 @@ import { C2S, S2C } from 'shared/protocol.js';
 import './RoomBrowser.css';
 
 export default function RoomBrowser({ playerName, onBack }) {
-  const [rooms, setRooms] = useState([]);
+  const [rooms, setRooms] = useState(null);
   const [joining, setJoining] = useState(null);
+  const autoCreated = useRef(false);
   const { socket } = useSocketContext();
   const actions = useGameActions();
   const { state } = useGame();
@@ -17,7 +18,14 @@ export default function RoomBrowser({ playerName, onBack }) {
 
     socket.emit(C2S.BROWSE_ROOMS);
 
-    const handleRoomList = ({ rooms }) => setRooms(rooms);
+    const handleRoomList = ({ rooms }) => {
+      setRooms(rooms);
+      // Auto-create a public room if none exist
+      if (rooms.length === 0 && !autoCreated.current) {
+        autoCreated.current = true;
+        actions.quickPlay(playerName);
+      }
+    };
     const handleReconnect = () => socket.emit(C2S.BROWSE_ROOMS);
 
     socket.on(S2C.PUBLIC_ROOM_LIST, handleRoomList);
@@ -56,16 +64,20 @@ export default function RoomBrowser({ playerName, onBack }) {
         </div>
 
         <div className="room-list">
-          {rooms.length === 0 ? (
-            <div className="no-rooms">
-              No public games available. Click Quick Play to start one!
-            </div>
+          {rooms === null ? (
+            <div className="no-rooms">Finding games...</div>
+          ) : rooms.length === 0 ? (
+            <div className="no-rooms">Creating a new game...</div>
           ) : (
             rooms.map(room => (
               <div key={room.code} className="room-card">
-                <div className="room-info">
-                  <span className="room-name">{room.name}</span>
-                  <span className="room-host">Host: {room.hostName}</span>
+                <div className="room-status">
+                  <span className="room-players-label">
+                    {room.playerCount}/4 Players
+                  </span>
+                  <span className="room-waiting">
+                    Waiting for {4 - room.playerCount} more...
+                  </span>
                 </div>
                 <div className="room-meta">
                   <div className="room-players-bar">
@@ -74,7 +86,6 @@ export default function RoomBrowser({ playerName, onBack }) {
                       style={{ width: `${(room.playerCount / room.maxPlayers) * 100}%` }}
                     />
                   </div>
-                  <span className="room-players-count">{room.playerCount}/{room.maxPlayers}</span>
                   <button
                     className="btn btn-primary room-join-btn"
                     onClick={() => handleJoin(room.code)}

@@ -153,23 +153,6 @@
   width: 100%;
 }
 
-.public-toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  user-select: none;
-}
-
-.public-toggle input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #f39c12;
-  cursor: pointer;
-}
-
 .lobby-footer {
   margin-top: 36px;
   color: rgba(255, 255, 255, 0.3);

@@ -9,8 +9,6 @@ export default function LobbyScreen() {
   const [playerName, setPlayerName] = useState('');
   const [roomCode, setRoomCode] = useState('');
   const [mode, setMode] = useState(null); // null, 'create', 'join', 'browse'
-  const [isPublic, setIsPublic] = useState(false);
-  const [roomName, setRoomName] = useState('');
   const actions = useGameActions();
   const { state } = useGame();
   const { connected } = useSocketContext();
@@ -27,12 +25,7 @@ export default function LobbyScreen() {
 
   const handleCreate = () => {
     if (!playerName.trim()) return;
-    if (isPublic) {
-      if (!roomName.trim()) return;
-      actions.createPublicRoom(playerName.trim(), roomName.trim());
-    } else {
-      actions.createRoom(playerName.trim());
-    }
+    actions.createRoom(playerName.trim());
   };
 
   const handleJoin = () => {
@@ -106,32 +99,8 @@ export default function LobbyScreen() {
                 maxLength={20}
               />
             </div>
-            <label className="public-toggle">
-              <input
-                type="checkbox"
-                checked={isPublic}
-                onChange={e => setIsPublic(e.target.checked)}
-              />
-              <span>Public room (visible to all players)</span>
-            </label>
-            {isPublic && (
-              <div className="lobby-name-input">
-                <label>Room Name</label>
-                <input
-                  type="text"
-                  value={roomName}
-                  onChange={e => setRoomName(e.target.value)}
-                  placeholder="e.g. Beginners Welcome"
-                  maxLength={30}
-                />
-              </div>
-            )}
-            <button
-              className="btn btn-primary lobby-btn"
-              onClick={handleCreate}
-              disabled={!playerName.trim() || (isPublic && !roomName.trim())}
-            >
-              Create New Game
+            <button className="btn btn-primary lobby-btn" onClick={handleCreate} disabled={!playerName.trim()}>
+              Create Private Game
             </button>
             <button className="btn btn-secondary lobby-btn" onClick={() => setMode(null)}>
               Back

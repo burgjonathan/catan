@@ -68,6 +68,15 @@ function notifyLobbyBrowsers(io) {
   io.to('lobby:browser').emit(S2C.PUBLIC_ROOM_LIST, { rooms });
 }
 
+function autoStartIfFull(io, code) {
+  const room = roomManager.getRoom(code);
+  if (!room || !room.isPublic || room.status !== 'waiting' || room.players.length < 4) return;
+  const gameState = gameEngine.createGame(room.players);
+  roomManager.setGameState(code, gameState);
+  broadcastGameState(io, code, gameState);
+  notifyLobbyBrowsers(io);
+}
+
 export function registerSocketHandlers(io) {
   io.on('connection', (socket) => {
     console.log(`Player connected: ${socket.id}`);
@@ -90,16 +99,18 @@ export function registerSocketHandlers(io) {
 
     socket.on(C2S.JOIN_ROOM, ({ code, playerName }) => {
       try {
-        const { room } = roomManager.joinRoom(code.toUpperCase(), socket.id, playerName);
-        socket.join(code.toUpperCase());
+        const upperCode = code.toUpperCase();
+        const { room } = roomManager.joinRoom(upperCode, socket.id, playerName);
+        socket.join(upperCode);
         socket.leave('lobby:browser');
         socket.emit(S2C.ROOM_JOINED, {
-          code: code.toUpperCase(),
+          code: upperCode,
           playerId: socket.id,
           players: room.players
         });
-        socket.to(code.toUpperCase()).emit(S2C.ROOM_UPDATED, { players: room.players });
+        socket.to(upperCode).emit(S2C.ROOM_UPDATED, { players: room.players });
         notifyLobbyBrowsers(io);
+        autoStartIfFull(io, upperCode);
       } catch (err) {
         socket.emit(S2C.ROOM_ERROR, { message: err.message });
       }
@@ -132,18 +143,12 @@ export function registerSocketHandlers(io) {
 
     // ---- PUBLIC ROOMS / LOBBY BROWSER ----
 
-    socket.on(C2S.CREATE_PUBLIC_ROOM, ({ playerName, roomName }) => {
+    socket.on(C2S.CREATE_PUBLIC_ROOM, ({ playerName }) => {
       try {
-        if (!roomName || !roomName.trim()) {
-          return socket.emit(S2C.ROOM_ERROR, { message: 'Room name is required' });
-        }
-        if (roomName.trim().length > 30) {
-          return socket.emit(S2C.ROOM_ERROR, { message: 'Room name too long (max 30 chars)' });
-        }
         if (roomManager.getRoomBySocket(socket.id)) {
           return socket.emit(S2C.ROOM_ERROR, { message: 'Already in a room' });
         }
-        const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim(), roomName.trim());
+        const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim());
         socket.join(code);
         socket.leave('lobby:browser');
         socket.emit(S2C.ROOM_CREATED, {
@@ -187,9 +192,9 @@ export function registerSocketHandlers(io) {
           });
           socket.to(available.code).emit(S2C.ROOM_UPDATED, { players: room.players });
           notifyLobbyBrowsers(io);
+          autoStartIfFull(io, available.code);
         } else {
-          const roomName = `${playerName.trim()}'s Game`;
-          const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim(), roomName);
+          const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim());
           socket.join(code);
           socket.leave('lobby:browser');
           socket.emit(S2C.ROOM_CREATED, {

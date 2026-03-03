@@ -33,11 +33,10 @@ export function createRoom(hostSocketId, hostName) {
   return { code, room };
 }
 
-export function createPublicRoom(hostSocketId, hostName, roomName) {
+export function createPublicRoom(hostSocketId, hostName) {
   const code = generateCode();
   const room = {
     code,
-    name: roomName,
     isPublic: true,
     players: [{
       id: hostSocketId,
@@ -61,8 +60,6 @@ export function getPublicRooms() {
     if (room.isPublic && room.status === 'waiting' && room.players.length < 4) {
       publicRooms.push({
         code,
-        name: room.name,
-        hostName: room.players.find(p => p.isHost)?.name || 'Unknown',
         playerCount: room.players.length,
         maxPlayers: 4,
         createdAt: room.createdAt
