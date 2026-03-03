@@ -34,10 +34,6 @@ export const C2S = {
   QUICK_PLAY: 'lobby:quickPlay',
 
   REJOIN: 'room:rejoin',
-
-  SIGNAL_OFFER: 'signal:offer',
-  SIGNAL_ANSWER: 'signal:answer',
-  SIGNAL_ICE: 'signal:ice',
 };
 
 // Server -> Client events
@@ -65,8 +61,4 @@ export const S2C = {
   PUBLIC_ROOM_LIST: 'lobby:roomList',
 
   REJOIN_SUCCESS: 'room:rejoinSuccess',
-
-  SIGNAL_OFFER: 'signal:offer',
-  SIGNAL_ANSWER: 'signal:answer',
-  SIGNAL_ICE: 'signal:ice',
 };

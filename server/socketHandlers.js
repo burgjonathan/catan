@@ -1,7 +1,6 @@
 import { C2S, S2C } from '../shared/protocol.js';
 import * as roomManager from './roomManager.js';
 import * as gameEngine from './gameEngine.js';
-import { setupSignaling } from './signalingRelay.js';
 
 function sanitizeStateForPlayer(state, playerId) {
   return {
@@ -413,10 +412,6 @@ export function registerSocketHandlers(io) {
         timestamp: Date.now()
       });
     });
-
-    // ---- SIGNALING ----
-
-    setupSignaling(socket, io);
 
     // ---- DISCONNECT ----
 

@@ -6,7 +6,6 @@ import PlayerPanel from '../components/hud/PlayerPanel';
 import ScoreBoard from '../components/hud/ScoreBoard';
 import OpponentBar from '../components/opponents/OpponentBar';
 import TradePanel from '../components/trade/TradePanel';
-import VideoChat from '../components/chat/VideoChat';
 import TextChat from '../components/chat/TextChat';
 import DiscardModal from '../components/common/DiscardModal';
 import StealModal from '../components/common/StealModal';
@@ -85,7 +84,6 @@ export default function GameScreen() {
         <div className="game-middle">
           {!tutorialMode && (
             <div className="game-sidebar-left">
-              <VideoChat />
               <TextChat />
             </div>
           )}

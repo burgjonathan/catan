@@ -5,7 +5,7 @@ import './SettingsPanel.css';
 export default function SettingsPanel() {
   const {
     musicOn, sfxOn, musicVolume, toggleMusic, toggleSfx, changeMusicVolume,
-    voiceChatMuted, chatMessagesMuted, toggleVoiceChatMute, toggleChatMessagesMute
+    chatMessagesMuted, toggleChatMessagesMute
   } = useAudio();
   const [expanded, setExpanded] = useState(false);
 
@@ -62,16 +62,6 @@ export default function SettingsPanel() {
           </div>
 
           <div className="settings-section-title">Chat</div>
-
-          <div className="settings-row">
-            <span className="settings-label">Voice Chat</span>
-            <button
-              className={`settings-switch ${!voiceChatMuted ? 'on' : ''}`}
-              onClick={toggleVoiceChatMute}
-            >
-              <span className="settings-switch-knob" />
-            </button>
-          </div>
 
           <div className="settings-row">
             <span className="settings-label">Chat Messages</span>
