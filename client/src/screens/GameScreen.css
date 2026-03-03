@@ -65,48 +65,51 @@
 }
 
 /* Leave Game Button */
-.leave-game-btn {
+.leave-game-wrap {
   position: fixed;
-  top: 12px;
-  left: 12px;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+}
+
+.leave-game-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 20px;
   background: rgba(15, 25, 40, 0.85);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  color: rgba(255, 255, 255, 0.8);
-  z-index: 200;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .leave-game-btn:hover {
   background: rgba(231, 76, 60, 0.6);
   border-color: rgba(231, 76, 60, 0.8);
-  transform: scale(1.1);
+  color: #fff;
 }
 
 .leave-game-confirm {
-  position: fixed;
-  top: 12px;
-  left: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
   background: rgba(15, 25, 40, 0.95);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  padding: 8px 14px;
-  z-index: 200;
-  animation: settingsFadeIn 0.15s ease;
+  border-radius: 20px;
+  padding: 6px 14px;
   color: rgba(255, 255, 255, 0.9);
   font-size: 13px;
   font-weight: 600;
+  animation: fadeInUp 0.15s ease;
 }
 
 .btn-sm {
