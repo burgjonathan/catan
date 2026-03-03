@@ -1,0 +1,75 @@
+.opponent-card {
+  background: linear-gradient(160deg, rgba(40, 30, 15, 0.7), rgba(25, 18, 8, 0.8));
+  border: 1.5px solid rgba(160, 120, 60, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 140px;
+  transition: all 0.2s;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.opponent-card.active-turn {
+  border-color: #f39c12;
+  background: linear-gradient(160deg, rgba(60, 40, 15, 0.8), rgba(40, 25, 8, 0.85));
+  box-shadow: 0 0 12px rgba(243, 156, 18, 0.2), 2px 3px 8px rgba(0,0,0,0.3);
+}
+
+.opponent-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.opponent-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(255,255,255,0.2);
+}
+
+.opponent-name {
+  font-weight: 700;
+  font-size: 13px;
+  flex: 1;
+}
+
+.opponent-stats {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.opponent-stat {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-icon {
+  font-size: 11px;
+}
+
+.opponent-badges {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.badge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.road-badge {
+  background: rgba(46, 204, 113, 0.3);
+  color: #2ecc71;
+}
+
+.army-badge {
+  background: rgba(231, 76, 60, 0.3);
+  color: #e74c3c;
+}

@@ -1,0 +1,130 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 32px;
+  min-width: 360px;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-content h3 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: #f39c12;
+  margin-bottom: 8px;
+}
+
+.modal-desc {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.discard-list {
+  text-align: left;
+}
+
+.discard-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.discard-icon {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
+}
+
+.discard-name {
+  flex: 1;
+  text-transform: capitalize;
+  font-size: 14px;
+}
+
+.discard-have {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  width: 30px;
+}
+
+.discard-count {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 12px;
+}
+
+.steal-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.steal-target-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.steal-target-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #f39c12;
+  transform: translateX(4px);
+}
+
+.steal-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.steal-cards {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}

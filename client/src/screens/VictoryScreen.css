@@ -1,0 +1,53 @@
+.victory-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(243, 156, 18, 0.2) 0%, transparent 70%);
+}
+
+.victory-container {
+  text-align: center;
+  animation: victoryIn 0.8s ease;
+}
+
+@keyframes victoryIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.victory-crown {
+  font-size: 80px;
+  color: #f1c40f;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.victory-title {
+  font-family: var(--font-display);
+  font-size: 64px;
+  color: #f1c40f;
+  margin: 16px 0;
+}
+
+.winner-name {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  margin: 8px 0;
+}
+
+.victory-subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 32px;
+}
+
+.victory-btn {
+  padding: 16px 48px;
+  font-size: 16px;
+}

@@ -1,0 +1,41 @@
+.trade-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.trade-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.trade-tab {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  border-bottom: 2px solid transparent;
+}
+
+.trade-tab.active {
+  color: #f39c12;
+  border-bottom-color: #f39c12;
+}
+
+.trade-tab:hover {
+  color: #fff;
+}
+
+.trade-content {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+}

@@ -1,0 +1,68 @@
+.trade-offer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trade-section h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 6px;
+}
+
+.trade-resource-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.trade-resource-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+}
+
+.trade-resource-name {
+  flex: 1;
+  text-transform: capitalize;
+  font-size: 12px;
+}
+
+.trade-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trade-counter button {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.trade-counter button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.trade-counter span {
+  width: 20px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.trade-submit-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 12px;
+}

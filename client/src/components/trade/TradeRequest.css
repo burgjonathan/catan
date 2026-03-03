@@ -1,0 +1,47 @@
+.trade-request {
+  background: rgba(243, 156, 18, 0.1);
+  border: 1px solid rgba(243, 156, 18, 0.3);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.trade-request h4 {
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: #f39c12;
+}
+
+.trade-req-resources {
+  margin-bottom: 8px;
+}
+
+.trade-req-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 4px;
+}
+
+.trade-req-item {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-right: 4px;
+  text-transform: capitalize;
+}
+
+.trade-req-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.trade-req-actions button {
+  flex: 1;
+  padding: 8px;
+  font-size: 12px;
+}

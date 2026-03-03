@@ -1,0 +1,112 @@
+.resource-cards {
+  display: flex;
+  gap: 8px;
+}
+
+.resource-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.resource-card {
+  width: 54px;
+  height: 74px;
+  border-radius: 6px;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Card inner border (parchment effect) */
+.resource-card::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+/* Card texture overlay */
+.resource-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    170deg,
+    rgba(255,255,255,0.12) 0%,
+    transparent 40%,
+    rgba(0,0,0,0.1) 100%
+  );
+  pointer-events: none;
+  border-radius: 6px;
+}
+
+.resource-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 2px 6px 12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+/* Individual card colors with gradients */
+.resource-card[data-resource="wood"] {
+  background: linear-gradient(160deg, #6d5037, #4a3525);
+  border-color: #3a2515;
+}
+.resource-card[data-resource="brick"] {
+  background: linear-gradient(160deg, #e04a18, #b83610);
+  border-color: #8a2808;
+}
+.resource-card[data-resource="sheep"] {
+  background: linear-gradient(160deg, #8ec84a, #5a9a28);
+  border-color: #3a7a18;
+}
+.resource-card[data-resource="wheat"] {
+  background: linear-gradient(160deg, #f5e038, #d4a820);
+  border-color: #b08818;
+}
+.resource-card[data-resource="ore"] {
+  background: linear-gradient(160deg, #8898a8, #5a6a7a);
+  border-color: #3a4a5a;
+}
+
+.resource-icon {
+  font-size: 22px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+}
+
+.resource-count {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-display);
+  transition: transform 0.2s;
+}
+
+/* Pop animation when count changes */
+.resource-card.count-updated .resource-count {
+  animation: countPop 0.3s ease;
+}
+
+@keyframes countPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+.resource-label {
+  font-size: 10px;
+  text-transform: capitalize;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}

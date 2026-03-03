@@ -1,0 +1,141 @@
+.waiting-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.waiting-container {
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  border-radius: 24px;
+  padding: 48px;
+  width: 480px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.waiting-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  margin-bottom: 24px;
+  color: #f39c12;
+}
+
+.room-code-display {
+  margin-bottom: 32px;
+}
+
+.room-code-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.room-code-value {
+  font-family: monospace;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: #f1c40f;
+  cursor: pointer;
+  padding: 12px;
+  transition: transform 0.2s;
+  user-select: all;
+}
+
+.room-code-value:hover {
+  transform: scale(1.05);
+}
+
+.copy-btn {
+  font-size: 12px;
+  padding: 8px 16px;
+}
+
+.players-list {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.players-list h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 12px;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.player-item.empty {
+  opacity: 0.3;
+}
+
+.player-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.empty-color {
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  background: transparent !important;
+}
+
+.player-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.you-badge {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  font-weight: 400;
+}
+
+.host-badge {
+  font-size: 10px;
+  background: rgba(243, 156, 18, 0.3);
+  color: #f39c12;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  font-weight: 400;
+}
+
+.player-color-name {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.waiting-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.start-btn {
+  padding: 16px;
+  font-size: 16px;
+}
+
+.waiting-msg {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  padding: 8px;
+}

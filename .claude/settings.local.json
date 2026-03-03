@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(node --version && npm --version)",
+      "Bash(cat /Users/burgjonathan/.claude/projects/-Users-burgjonathan-Downloads-catan/95b1e17b-4d05-4d4e-8268-3ef97a676cd4/tool-results/toolu_01JpXFpVe2uGtGM6bXNowYFf.json | python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); text=data[0]['text']; print\\(text[:15000]\\)\")",
+      "Bash(cat /Users/burgjonathan/.claude/projects/-Users-burgjonathan-Downloads-catan/95b1e17b-4d05-4d4e-8268-3ef97a676cd4/tool-results/toolu_01JpXFpVe2uGtGM6bXNowYFf.json | python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); text=data[0]['text']; print\\(text[15000:30000]\\)\")",
+      "Bash(cat /Users/burgjonathan/.claude/projects/-Users-burgjonathan-Downloads-catan/95b1e17b-4d05-4d4e-8268-3ef97a676cd4/tool-results/toolu_01JpXFpVe2uGtGM6bXNowYFf.json | python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); text=data[0]['text']; print\\(text[30000:45000]\\)\")",
+      "Bash(cat /Users/burgjonathan/.claude/projects/-Users-burgjonathan-Downloads-catan/95b1e17b-4d05-4d4e-8268-3ef97a676cd4/tool-results/toolu_01JpXFpVe2uGtGM6bXNowYFf.json | python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); text=data[0]['text']; print\\(text[45000:60000]\\)\")",
+      "Bash(node -e \"import\\('./shared/hexGeometry.js'\\).then\\(m => { console.log\\('Hex positions:', m.HEX_POSITIONS.length\\); console.log\\('Vertices:', m.getAllVertices\\(\\).length\\); console.log\\('Edges:', m.getAllEdges\\(\\).length\\); }\\)\")",
+      "Bash(node -e \"import\\('./server/boardGenerator.js'\\).then\\(m => { const b = m.generateBoard\\(\\); console.log\\('Hexes:', b.hexes.length\\); console.log\\('Ports:', b.ports.length\\); console.log\\('Vertices:', Object.keys\\(b.vertices\\).length\\); console.log\\('Edges:', Object.keys\\(b.edges\\).length\\); console.log\\('Robber:', b.robberHex\\); console.log\\('Desert hex:', b.hexes.find\\(h => h.terrain === 'desert'\\)\\); }\\)\")",
+      "Bash(lsof -i :3001 2>/dev/null | grep LISTEN; lsof -i :5173 2>/dev/null | grep LISTEN)",
+      "Bash(curl -s http://localhost:5173 | head -20)",
+      "Bash(npx -w client vite build 2>&1)",
+      "Bash(find /Users/burgjonathan/Downloads/catan -type f -name \"*settings*\" -o -name \"*preferences*\" 2>/dev/null | head -20)",
+      "Bash(render whoami 2>&1)",
+      "Bash(render --help 2>&1 | head -50)",
+      "Bash(render whoami -o json 2>&1)",
+      "Bash(gh auth status 2>&1)"
+    ]
+  }
+}

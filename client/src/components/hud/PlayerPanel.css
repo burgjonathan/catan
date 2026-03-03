@@ -1,0 +1,40 @@
+.player-panel {
+  background: var(--panel-bg);
+  border-top: 1px solid var(--panel-border);
+  padding: 8px 16px;
+  flex-shrink: 0;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.3);
+}
+
+.player-panel-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100px;
+}
+
+.player-panel-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.player-panel-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.player-panel-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.end-turn-btn {
+  padding: 12px 24px;
+  font-size: 13px;
+  white-space: nowrap;
+  font-family: var(--font-display);
+}
