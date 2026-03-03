@@ -154,7 +154,8 @@ export function registerSocketHandlers(io) {
         socket.emit(S2C.ROOM_CREATED, {
           code,
           playerId: socket.id,
-          players: room.players
+          players: room.players,
+          isPublic: true
         });
         notifyLobbyBrowsers(io);
       } catch (err) {
@@ -188,7 +189,8 @@ export function registerSocketHandlers(io) {
           socket.emit(S2C.ROOM_JOINED, {
             code: available.code,
             playerId: socket.id,
-            players: room.players
+            players: room.players,
+            isPublic: true
           });
           socket.to(available.code).emit(S2C.ROOM_UPDATED, { players: room.players });
           notifyLobbyBrowsers(io);
@@ -200,7 +202,8 @@ export function registerSocketHandlers(io) {
           socket.emit(S2C.ROOM_CREATED, {
             code,
             playerId: socket.id,
-            players: room.players
+            players: room.players,
+            isPublic: true
           });
           notifyLobbyBrowsers(io);
         }

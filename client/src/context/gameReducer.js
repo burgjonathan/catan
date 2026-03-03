@@ -4,6 +4,7 @@ export const initialState = {
   playerId: null,
   playerName: null,
   players: [],
+  isPublic: false,
   gameState: null,
   error: null,
   gameLog: [],
@@ -24,6 +25,7 @@ export function gameReducer(state, action) {
         roomCode: action.payload.code,
         playerId: action.payload.playerId,
         players: action.payload.players,
+        isPublic: action.payload.isPublic || false,
         error: null
       };
 
@@ -34,6 +36,7 @@ export function gameReducer(state, action) {
         roomCode: action.payload.code,
         playerId: action.payload.playerId,
         players: action.payload.players,
+        isPublic: action.payload.isPublic || false,
         error: null
       };
 

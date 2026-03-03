@@ -5,7 +5,7 @@ import './WaitingRoom.css';
 export default function WaitingRoom() {
   const { state } = useGame();
   const actions = useGameActions();
-  const { roomCode, players, playerId } = state;
+  const { roomCode, players, playerId, isPublic } = state;
 
   const isHost = players[0]?.id === playerId;
   const canStart = players.length >= 2;
@@ -18,6 +18,49 @@ export default function WaitingRoom() {
   const copyLink = () => {
     navigator.clipboard.writeText(shareLink);
   };
+
+  if (isPublic) {
+    return (
+      <div className="waiting-screen">
+        <div className="waiting-container">
+          <h2 className="waiting-title">Finding Players</h2>
+
+          <div className="public-waiting-status">
+            <span className="public-player-count">{players.length}/4</span>
+            <span className="public-player-label">Players in Game</span>
+            <p className="waiting-msg">
+              {players.length < 4 ? `Waiting for ${4 - players.length} more...` : 'Starting game...'}
+            </p>
+          </div>
+
+          <div className="players-list">
+            {players.map((p) => (
+              <div key={p.id} className="player-item">
+                <div className="player-color" style={{ background: p.color }} />
+                <span className="player-name">
+                  {p.name}
+                  {p.id === playerId && <span className="you-badge">You</span>}
+                </span>
+                <span className="player-color-name">{p.colorName}</span>
+              </div>
+            ))}
+            {Array.from({ length: 4 - players.length }).map((_, i) => (
+              <div key={`empty-${i}`} className="player-item empty">
+                <div className="player-color empty-color" />
+                <span className="player-name">Waiting for player...</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="waiting-actions">
+            <button className="btn btn-secondary" onClick={() => actions.leaveRoom()}>
+              Leave
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="waiting-screen">
@@ -36,7 +79,7 @@ export default function WaitingRoom() {
 
         <div className="players-list">
           <h3>Players ({players.length}/4)</h3>
-          {players.map((p, i) => (
+          {players.map((p) => (
             <div key={p.id} className="player-item">
               <div className="player-color" style={{ background: p.color }} />
               <span className="player-name">

@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import { useGameActions } from '../hooks/useGameActions';
 import { useGame } from '../context/GameContext';
 import { useSocketContext } from '../context/SocketContext';
-import RoomBrowser from './RoomBrowser';
 import './LobbyScreen.css';
 
 export default function LobbyScreen() {
   const [playerName, setPlayerName] = useState('');
   const [roomCode, setRoomCode] = useState('');
-  const [mode, setMode] = useState(null); // null, 'create', 'join', 'browse'
+  const [mode, setMode] = useState(null); // null, 'create', 'join'
   const actions = useGameActions();
   const { state } = useGame();
   const { connected } = useSocketContext();
@@ -33,9 +32,10 @@ export default function LobbyScreen() {
     actions.joinRoom(roomCode.trim().toUpperCase(), playerName.trim());
   };
 
-  if (mode === 'browse' && connected) {
-    return <RoomBrowser playerName={playerName.trim()} onBack={() => setMode(null)} />;
-  }
+  const handleQuickPlay = () => {
+    if (!playerName.trim()) return;
+    actions.quickPlay(playerName.trim());
+  };
 
   return (
     <div className="lobby-screen">
@@ -67,23 +67,23 @@ export default function LobbyScreen() {
                 onChange={e => setPlayerName(e.target.value)}
                 placeholder="Enter your name"
                 maxLength={20}
-                onKeyDown={e => e.key === 'Enter' && playerName.trim() && setMode('create')}
+                onKeyDown={e => e.key === 'Enter' && playerName.trim() && handleQuickPlay()}
               />
             </div>
+            <button className="btn btn-primary lobby-btn lobby-browse-btn" onClick={handleQuickPlay} disabled={!playerName.trim()}>
+              Play Online
+            </button>
+            <div className="lobby-divider">
+              <span>OR</span>
+            </div>
             <div className="lobby-buttons">
-              <button className="btn btn-primary lobby-btn" onClick={() => playerName.trim() && setMode('create')} disabled={!playerName.trim()}>
-                Create Room
+              <button className="btn btn-secondary lobby-btn" onClick={() => playerName.trim() && setMode('create')} disabled={!playerName.trim()}>
+                Create Private Room
               </button>
               <button className="btn btn-secondary lobby-btn" onClick={() => playerName.trim() && setMode('join')} disabled={!playerName.trim()}>
                 Join by Code
               </button>
             </div>
-            <div className="lobby-divider">
-              <span>OR</span>
-            </div>
-            <button className="btn btn-primary lobby-btn lobby-browse-btn" onClick={() => playerName.trim() && setMode('browse')} disabled={!playerName.trim()}>
-              Browse Public Games
-            </button>
           </div>
         )}
 
