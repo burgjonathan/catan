@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { SocketProvider } from './context/SocketContext';
 import { GameProvider, useGame } from './context/GameContext';
 import { AudioProvider } from './context/AudioContext';
@@ -5,11 +6,22 @@ import LobbyScreen from './screens/LobbyScreen';
 import WaitingRoom from './screens/WaitingRoom';
 import GameScreen from './screens/GameScreen';
 import VictoryScreen from './screens/VictoryScreen';
+import AdminDashboard from './screens/AdminDashboard';
 import SettingsPanel from './components/common/SettingsPanel';
 import SoundTriggers from './components/common/SoundTriggers';
 
 function AppContent() {
   const { state } = useGame();
+  const [showAdmin, setShowAdmin] = useState(
+    () => window.location.search.includes('admin')
+  );
+
+  if (showAdmin) {
+    return <AdminDashboard onBack={() => {
+      setShowAdmin(false);
+      window.history.replaceState({}, '', window.location.pathname);
+    }} />;
+  }
 
   switch (state.screen) {
     case 'lobby':

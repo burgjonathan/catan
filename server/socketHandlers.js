@@ -1,6 +1,7 @@
 import { C2S, S2C } from '../shared/protocol.js';
 import * as roomManager from './roomManager.js';
 import * as gameEngine from './gameEngine.js';
+import { trackConnect, trackDisconnect, trackGameStart } from './analytics.js';
 
 function sanitizeStateForPlayer(state, playerId) {
   return {
@@ -72,6 +73,9 @@ function autoStartIfFull(io, code) {
   if (!room || !room.isPublic || room.status !== 'waiting' || room.players.length < 4) return;
   const gameState = gameEngine.createGame(room.players);
   roomManager.setGameState(code, gameState);
+  for (const p of room.players) {
+    if (p.sessionId) trackGameStart(p.sessionId);
+  }
   broadcastGameState(io, code, gameState);
   notifyLobbyBrowsers(io);
 }
@@ -79,6 +83,12 @@ function autoStartIfFull(io, code) {
 export function registerSocketHandlers(io) {
   io.on('connection', (socket) => {
     console.log(`Player connected: ${socket.id}`);
+
+    // Track analytics
+    const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+    const userAgent = socket.handshake.headers['user-agent'] || '';
+    const sessionIdFromQuery = socket.handshake.auth?.sessionId || 'unknown';
+    trackConnect(socket.id, sessionIdFromQuery, ip, userAgent);
 
     // ---- ROOM EVENTS ----
 
@@ -141,6 +151,10 @@ export function registerSocketHandlers(io) {
 
         const gameState = gameEngine.createGame(room.players);
         roomManager.setGameState(code, gameState);
+        // Track game start for all players
+        for (const p of room.players) {
+          if (p.sessionId) trackGameStart(p.sessionId);
+        }
         broadcastGameState(io, code, gameState);
         notifyLobbyBrowsers(io);
       } catch (err) {
@@ -223,6 +237,8 @@ export function registerSocketHandlers(io) {
 
     socket.on(C2S.REJOIN, ({ sessionId }) => {
       if (!sessionId) return;
+      // Update analytics with real session ID
+      trackConnect(socket.id, sessionId, ip, userAgent);
       const result = roomManager.reconnectPlayer(sessionId, socket.id);
       if (!result) return; // No session to rejoin
 
@@ -417,6 +433,7 @@ export function registerSocketHandlers(io) {
 
     socket.on('disconnect', () => {
       console.log(`Player disconnected: ${socket.id}`);
+      trackDisconnect(socket.id);
       const result = roomManager.markDisconnected(socket.id, (code, oldSocketId) => {
         // This runs after 30s timeout if player doesn't reconnect
         const { room, isEmpty } = roomManager.leaveRoom(code, oldSocketId);

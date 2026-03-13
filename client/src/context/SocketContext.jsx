@@ -20,7 +20,8 @@ export function SocketProvider({ children }) {
 
   useEffect(() => {
     const socket = io(window.location.origin, {
-      transports: ['websocket', 'polling']
+      transports: ['websocket', 'polling'],
+      auth: { sessionId: sessionId.current }
     });
     socketRef.current = socket;
 
