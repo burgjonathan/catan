@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import './AdminDashboard.css';
 
-const ADMIN_KEY_STORAGE = 'catan_admin_key';
+const ADMIN_TOKEN_KEY = 'catan_admin_token';
 
 function formatDuration(ms) {
   if (ms < 1000) return '0s';
@@ -22,23 +22,25 @@ function shortenSession(id) {
   return id.substring(0, 8) + '...';
 }
 
+export function isAdmin() {
+  return !!localStorage.getItem(ADMIN_TOKEN_KEY);
+}
+
 export default function AdminDashboard({ onBack }) {
-  const [adminKey, setAdminKey] = useState(localStorage.getItem(ADMIN_KEY_STORAGE) || '');
-  const [authenticated, setAuthenticated] = useState(false);
-  const [keyInput, setKeyInput] = useState('');
-  const [error, setError] = useState('');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
 
-  const fetchStats = useCallback(async (key) => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/admin/analytics?key=${encodeURIComponent(key)}`);
+      const res = await fetch('/api/admin/analytics', {
+        headers: { 'x-admin-token': token }
+      });
       if (!res.ok) {
         if (res.status === 401) {
-          setAuthenticated(false);
-          localStorage.removeItem(ADMIN_KEY_STORAGE);
-          setError('Invalid admin key');
+          setError('Admin access revoked');
           return;
         }
         throw new Error('Failed to fetch');
@@ -51,98 +53,33 @@ export default function AdminDashboard({ onBack }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const key = keyInput.trim();
-    if (!key) return;
-
-    const res = await fetch(`/api/admin/analytics?key=${encodeURIComponent(key)}`);
-    if (res.ok) {
-      localStorage.setItem(ADMIN_KEY_STORAGE, key);
-      setAdminKey(key);
-      setAuthenticated(true);
-      setError('');
-      const data = await res.json();
-      setStats(data);
-    } else {
-      setError('Wrong admin key');
-    }
-  };
-
-  // Auto-login if key is stored
   useEffect(() => {
-    if (adminKey && !authenticated) {
-      fetch(`/api/admin/analytics?key=${encodeURIComponent(adminKey)}`)
-        .then(res => {
-          if (res.ok) {
-            setAuthenticated(true);
-            return res.json();
-          }
-          localStorage.removeItem(ADMIN_KEY_STORAGE);
-          return null;
-        })
-        .then(data => { if (data) setStats(data); });
-    }
-  }, []);
+    fetchStats();
+  }, [fetchStats]);
 
   // Auto-refresh every 10 seconds
   useEffect(() => {
-    if (!authenticated || !adminKey) return;
-    const interval = setInterval(() => fetchStats(adminKey), 10000);
+    const interval = setInterval(fetchStats, 10000);
     return () => clearInterval(interval);
-  }, [authenticated, adminKey, fetchStats]);
-
-  if (!authenticated) {
-    return (
-      <div className="admin-login">
-        <div className="admin-login-box">
-          <h2>Admin Dashboard</h2>
-          <form onSubmit={handleLogin}>
-            <input
-              type="password"
-              placeholder="Enter admin key..."
-              value={keyInput}
-              onChange={e => setKeyInput(e.target.value)}
-              autoFocus
-            />
-            {error && <div className="admin-login-error">{error}</div>}
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-              Login
-            </button>
-          </form>
-          <div style={{ marginTop: 16 }}>
-            <button className="admin-back-btn btn btn-secondary" onClick={onBack}>
-              Back to Game
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [fetchStats]);
 
   return (
     <div className="admin-screen">
       <div className="admin-header">
         <h1>Analytics Dashboard</h1>
         <div className="admin-header-actions">
-          <button className="btn btn-secondary" onClick={() => fetchStats(adminKey)} disabled={loading}>
+          <button className="btn btn-secondary" onClick={fetchStats} disabled={loading}>
             {loading ? 'Refreshing...' : 'Refresh'}
           </button>
           <button className="admin-back-btn btn btn-secondary" onClick={onBack}>
             Back to Game
           </button>
-          <button className="btn btn-secondary" onClick={() => {
-            localStorage.removeItem(ADMIN_KEY_STORAGE);
-            setAuthenticated(false);
-            setAdminKey('');
-            setStats(null);
-          }}>
-            Logout
-          </button>
         </div>
       </div>
+
+      {error && <div className="lobby-error" style={{ marginBottom: 16 }}>{error}</div>}
 
       {stats && (
         <>

@@ -3,9 +3,10 @@ import { useGameActions } from '../hooks/useGameActions';
 import { useGame } from '../context/GameContext';
 import { useSocketContext } from '../context/SocketContext';
 import { generateDemoGameState, TUTORIAL_PLAYER_ID } from '../utils/demoGameState';
+import { isAdmin } from './AdminDashboard';
 import './LobbyScreen.css';
 
-export default function LobbyScreen() {
+export default function LobbyScreen({ onShowAdmin }) {
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('catan_playerName') || '');
   const [roomCode, setRoomCode] = useState('');
   const [mode, setMode] = useState(null); // null, 'create', 'join'
@@ -161,6 +162,11 @@ export default function LobbyScreen() {
           <button className="lobby-tutorial-btn" onClick={handleTutorial}>
             How to Play
           </button>
+          {isAdmin() && (
+            <button className="lobby-tutorial-btn" onClick={onShowAdmin} style={{ marginLeft: 8 }}>
+              Analytics
+            </button>
+          )}
           <p>2-4 Players</p>
         </div>
       </div>
