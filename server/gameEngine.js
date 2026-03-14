@@ -19,6 +19,8 @@ export function createGame(roomPlayers) {
     name: p.name,
     color: p.color,
     colorName: p.colorName,
+    isBot: p.isBot || false,
+    difficulty: p.difficulty || null,
     resources: createEmptyResources(),
     devCards: [],
     newDevCards: [],

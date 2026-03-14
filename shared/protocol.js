@@ -34,6 +34,7 @@ export const C2S = {
   QUICK_PLAY: 'lobby:quickPlay',
 
   REJOIN: 'room:rejoin',
+  CREATE_BOT_GAME: 'room:createBotGame',
 };
 
 // Server -> Client events

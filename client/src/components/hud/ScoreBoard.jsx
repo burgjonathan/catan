@@ -67,7 +67,7 @@ export default function ScoreBoard() {
         {opponents.map(p => (
           <ScoreEntry
             key={p.id}
-            name={p.name}
+            name={p.isBot ? `${p.name} [BOT]` : p.name}
             color={p.color}
             vp={getVP(p, p.id)}
             isCurrentTurn={currentPlayerId === p.id}

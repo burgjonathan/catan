@@ -2,6 +2,7 @@ import { C2S, S2C } from '../shared/protocol.js';
 import * as roomManager from './roomManager.js';
 import * as gameEngine from './gameEngine.js';
 import { trackConnect, trackDisconnect, trackGameStart } from './analytics.js';
+import { checkAndRunBot } from './botController.js';
 
 function sanitizeStateForPlayer(state, playerId) {
   return {
@@ -56,6 +57,10 @@ function handleGameAction(io, socket, roomCode, actionFn) {
     }
 
     broadcastGameState(io, roomCode, state);
+
+    // Trigger bot actions if needed
+    checkAndRunBot(io, roomCode, room);
+
     return result;
   } catch (err) {
     socket.emit(S2C.GAME_ERROR, { message: err.message });
@@ -78,6 +83,7 @@ function autoStartIfFull(io, code) {
   }
   broadcastGameState(io, code, gameState);
   notifyLobbyBrowsers(io);
+  checkAndRunBot(io, code, room);
 }
 
 export function registerSocketHandlers(io) {
@@ -157,8 +163,48 @@ export function registerSocketHandlers(io) {
         }
         broadcastGameState(io, code, gameState);
         notifyLobbyBrowsers(io);
+        checkAndRunBot(io, code, room);
       } catch (err) {
         socket.emit(S2C.GAME_ERROR, { message: err.message });
+      }
+    });
+
+    socket.on(C2S.CREATE_BOT_GAME, ({ playerName, sessionId, botCount, difficulty }) => {
+      try {
+        if (!playerName || !playerName.trim()) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'Player name is required' });
+        }
+        if (!botCount || botCount < 1 || botCount > 3) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'Bot count must be 1-3' });
+        }
+        if (!['easy', 'medium', 'hard'].includes(difficulty)) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'Invalid difficulty' });
+        }
+
+        // Create room with human player
+        const { code, room } = roomManager.createRoom(socket.id, playerName.trim(), sessionId);
+        socket.join(code);
+
+        // Add bots
+        roomManager.addBotsToRoom(code, botCount, difficulty);
+
+        // Emit room created so client transitions
+        socket.emit(S2C.ROOM_CREATED, {
+          code,
+          playerId: socket.id,
+          players: room.players
+        });
+
+        // Start game immediately
+        const gameState = gameEngine.createGame(room.players);
+        roomManager.setGameState(code, gameState);
+        if (sessionId) trackGameStart(sessionId);
+        broadcastGameState(io, code, gameState);
+
+        // Kick off bot turns
+        checkAndRunBot(io, code, room);
+      } catch (err) {
+        socket.emit(S2C.ROOM_ERROR, { message: err.message });
       }
     });
 
@@ -380,6 +426,19 @@ export function registerSocketHandlers(io) {
       if (!found) return;
       handleGameAction(io, socket, found.code, (state) => {
         gameEngine.tradeOffer(state, socket.id, offering, requesting);
+        // Auto-reject trade for all bots
+        if (state.pendingTrade) {
+          for (const p of state.players) {
+            if (p.isBot && state.pendingTrade.responses[p.id] === 'pending') {
+              state.pendingTrade.responses[p.id] = 'rejected';
+            }
+          }
+          // If all rejected (all opponents are bots), clear the trade
+          const allRejected = Object.values(state.pendingTrade.responses).every(r => r === 'rejected');
+          if (allRejected) {
+            state.pendingTrade = null;
+          }
+        }
       });
     });
 

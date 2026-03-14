@@ -40,6 +40,9 @@ export function useGameActions() {
     placeInitialSettlement: (vertexKey) => socket?.emit(C2S.PLACE_INITIAL_SETTLEMENT, { vertexKey }),
     placeInitialRoad: (edgeKey) => socket?.emit(C2S.PLACE_INITIAL_ROAD, { edgeKey }),
 
+    createBotGame: (playerName, botCount, difficulty) =>
+      socket?.emit(C2S.CREATE_BOT_GAME, { playerName, sessionId, botCount, difficulty }),
+
     sendChat: (text) => socket?.emit(C2S.CHAT_MESSAGE, { text }),
 
     setPendingAction: (action) => dispatch({ type: 'SET_PENDING_ACTION', payload: action }),

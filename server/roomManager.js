@@ -1,4 +1,6 @@
 import { PLAYER_COLORS, PLAYER_COLOR_NAMES } from '../shared/constants.js';
+import { createBotPlayer } from './botPlayer.js';
+import { pickBotNames } from './botNames.js';
 
 const rooms = new Map();
 const disconnectTimers = new Map(); // sessionId -> timeout handle
@@ -203,6 +205,20 @@ export function cancelDisconnectTimer(sessionId) {
     clearTimeout(disconnectTimers.get(sessionId));
     disconnectTimers.delete(sessionId);
   }
+}
+
+export function addBotsToRoom(code, botCount, difficulty) {
+  const room = rooms.get(code);
+  if (!room) throw new Error('Room not found');
+  if (room.players.length + botCount > 4) throw new Error('Too many players');
+
+  const names = pickBotNames(botCount);
+  for (let i = 0; i < botCount; i++) {
+    const colorIndex = room.players.length;
+    const bot = createBotPlayer(colorIndex, difficulty, names[i]);
+    room.players.push(bot);
+  }
+  return room;
 }
 
 export function setGameState(code, gameState) {

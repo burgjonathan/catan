@@ -9,7 +9,9 @@ import './LobbyScreen.css';
 export default function LobbyScreen({ onShowAdmin }) {
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('catan_playerName') || '');
   const [roomCode, setRoomCode] = useState('');
-  const [mode, setMode] = useState(null); // null, 'create', 'join'
+  const [mode, setMode] = useState(null); // null, 'create', 'join', 'bots'
+  const [botCount, setBotCount] = useState(1);
+  const [botDifficulty, setBotDifficulty] = useState('medium');
   const actions = useGameActions();
   const { state, dispatch } = useGame();
   const { connected } = useSocketContext();
@@ -54,6 +56,12 @@ export default function LobbyScreen({ onShowAdmin }) {
     actions.quickPlay(playerName.trim());
   };
 
+  const handleBotGame = () => {
+    if (!playerName.trim()) return;
+    saveName(playerName.trim());
+    actions.createBotGame(playerName.trim(), botCount, botDifficulty);
+  };
+
   return (
     <div className="lobby-screen">
       <div className="lobby-bg-hex hex-1" />
@@ -89,6 +97,9 @@ export default function LobbyScreen({ onShowAdmin }) {
             </div>
             <button className="btn btn-primary lobby-btn lobby-browse-btn" onClick={handleQuickPlay} disabled={!playerName.trim()}>
               Play Online
+            </button>
+            <button className="btn btn-secondary lobby-btn lobby-browse-btn lobby-bot-btn" onClick={() => playerName.trim() && setMode('bots')} disabled={!playerName.trim()}>
+              Play vs Bots
             </button>
             <div className="lobby-divider">
               <span>OR</span>
@@ -158,6 +169,60 @@ export default function LobbyScreen({ onShowAdmin }) {
           </div>
         )}
 
+        {mode === 'bots' && connected && (
+          <div className="lobby-actions">
+            <div className="lobby-name-input">
+              <label>Your Name</label>
+              <input
+                type="text"
+                value={playerName}
+                onChange={e => setPlayerName(e.target.value)}
+                placeholder="Enter your name"
+                maxLength={20}
+              />
+            </div>
+            <div className="lobby-name-input">
+              <label>Number of Bots</label>
+              <div className="bot-selector">
+                {[1, 2, 3].map(n => (
+                  <button
+                    key={n}
+                    className={`bot-count-btn ${botCount === n ? 'active' : ''}`}
+                    onClick={() => setBotCount(n)}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="lobby-name-input">
+              <label>Difficulty</label>
+              <div className="bot-difficulty">
+                {[
+                  { id: 'easy', label: 'Easy', desc: 'Learning the ropes' },
+                  { id: 'medium', label: 'Medium', desc: 'Solid competition' },
+                  { id: 'hard', label: 'Hard', desc: 'Expert strategist' }
+                ].map(d => (
+                  <button
+                    key={d.id}
+                    className={`bot-diff-btn ${botDifficulty === d.id ? 'active' : ''}`}
+                    onClick={() => setBotDifficulty(d.id)}
+                  >
+                    <span className="bot-diff-label">{d.label}</span>
+                    <span className="bot-diff-desc">{d.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button className="btn btn-primary lobby-btn" onClick={handleBotGame} disabled={!playerName.trim()}>
+              Start Game
+            </button>
+            <button className="btn btn-secondary lobby-btn" onClick={() => setMode(null)}>
+              Back
+            </button>
+          </div>
+        )}
+
         <div className="lobby-footer">
           <button className="lobby-tutorial-btn" onClick={handleTutorial}>
             How to Play
@@ -167,7 +232,7 @@ export default function LobbyScreen({ onShowAdmin }) {
               Analytics
             </button>
           )}
-          <p>2-4 Players</p>
+          <p>2-4 Players / Play vs Bots</p>
         </div>
       </div>
     </div>

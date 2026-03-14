@@ -63,6 +63,17 @@ export const RESOURCE_COLORS = {
   ore: '#78909c'
 };
 
+export const BOT_DIFFICULTIES = ['easy', 'medium', 'hard'];
+export const BOT_ACTION_DELAYS = {
+  setup: 1200,
+  roll: 1000,
+  build: 800,
+  endTurn: 1500,
+  discard: 600,
+  robber: 1000,
+  steal: 800
+};
+
 export const RESOURCE_ICONS = {
   wood: '🌲',
   brick: '🧱',

@@ -178,3 +178,85 @@
   border-color: rgba(243, 156, 18, 0.4);
   background: rgba(243, 156, 18, 0.08);
 }
+
+/* Bot mode styles */
+.lobby-bot-btn {
+  background: rgba(155, 89, 182, 0.15) !important;
+  border-color: rgba(155, 89, 182, 0.4) !important;
+  color: #bb86fc !important;
+}
+
+.lobby-bot-btn:hover:not(:disabled) {
+  background: rgba(155, 89, 182, 0.25) !important;
+  border-color: rgba(155, 89, 182, 0.6) !important;
+}
+
+.bot-selector {
+  display: flex;
+  gap: 8px;
+}
+
+.bot-count-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bot-count-btn:hover {
+  border-color: rgba(155, 89, 182, 0.4);
+  background: rgba(155, 89, 182, 0.15);
+}
+
+.bot-count-btn.active {
+  border-color: #bb86fc;
+  background: rgba(155, 89, 182, 0.3);
+  color: #fff;
+}
+
+.bot-difficulty {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bot-diff-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.bot-diff-btn:hover {
+  border-color: rgba(155, 89, 182, 0.4);
+  background: rgba(155, 89, 182, 0.15);
+}
+
+.bot-diff-btn.active {
+  border-color: #bb86fc;
+  background: rgba(155, 89, 182, 0.3);
+  color: #fff;
+}
+
+.bot-diff-label {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.bot-diff-desc {
+  font-size: 12px;
+  opacity: 0.6;
+}
