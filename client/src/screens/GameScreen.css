@@ -117,3 +117,51 @@
   padding: 4px 12px;
   font-size: 11px;
 }
+
+/* Spectator banner */
+.spectator-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 0;
+  background: rgba(52, 152, 219, 0.2);
+  border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+  color: #5dade2;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ─── Mobile: hide sidebars, stack vertically ─── */
+@media (max-width: 768px) {
+  .game-sidebar-left,
+  .game-sidebar-right {
+    display: none;
+  }
+
+  .game-board-area {
+    padding: 4px;
+  }
+
+  .game-error-toast {
+    bottom: 120px;
+    font-size: 12px;
+    padding: 8px 16px;
+  }
+
+  .leave-game-wrap {
+    bottom: 8px;
+  }
+}
+
+/* ─── Tablet: narrower sidebars ─── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .game-sidebar-left {
+    width: 200px;
+  }
+  .game-sidebar-right {
+    width: 220px;
+  }
+}

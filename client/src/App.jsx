@@ -9,6 +9,7 @@ import VictoryScreen from './screens/VictoryScreen';
 import AdminDashboard, { isAdmin } from './screens/AdminDashboard';
 import SettingsPanel from './components/common/SettingsPanel';
 import SoundTriggers from './components/common/SoundTriggers';
+import FriendInviteToast from './components/common/FriendInviteToast';
 
 const ADMIN_TOKEN_KEY = 'catan_admin_token';
 
@@ -66,6 +67,7 @@ export default function App() {
           <AppContent />
           <SettingsPanel />
           <SoundTriggers />
+          <FriendInviteToast />
         </AudioProvider>
       </GameProvider>
     </SocketProvider>

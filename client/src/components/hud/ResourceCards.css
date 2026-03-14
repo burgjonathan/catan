@@ -114,3 +114,20 @@
   font-weight: 600;
   letter-spacing: 0.3px;
 }
+
+@media (max-width: 768px) {
+  .resource-card {
+    width: 42px;
+    min-width: 32px;
+    height: 58px;
+  }
+  .resource-icon {
+    font-size: 16px;
+  }
+  .resource-count {
+    font-size: 14px;
+  }
+  .resource-label {
+    display: none;
+  }
+}

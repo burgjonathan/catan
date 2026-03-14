@@ -20,7 +20,18 @@ export const TERRAIN_COUNTS = {
   desert: 1
 };
 
+export const TERRAIN_COUNTS_EXPANSION = {
+  forest: 8,
+  hills: 6,
+  pasture: 7,
+  fields: 7,
+  mountains: 6,
+  desert: 3
+};
+
 export const NUMBER_TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11];
+
+export const NUMBER_TOKENS_EXPANSION = [2, 5, 4, 6, 3, 9, 8, 11, 11, 10, 6, 3, 8, 4, 8, 10, 11, 12, 3, 4, 5, 9, 5, 9, 12, 10, 6, 2, 5, 9, 4, 10, 3, 8];
 
 export const COSTS = {
   road: { wood: 1, brick: 1 },
@@ -43,8 +54,8 @@ export const MAX_CITIES = 4;
 export const MAX_ROADS = 15;
 export const VP_TO_WIN = 10;
 
-export const PLAYER_COLORS = ['#e74c3c', '#3498db', '#f39c12', '#2ecc71'];
-export const PLAYER_COLOR_NAMES = ['Red', 'Blue', 'Orange', 'Green'];
+export const PLAYER_COLORS = ['#e74c3c', '#3498db', '#f39c12', '#2ecc71', '#9b59b6', '#e67e22'];
+export const PLAYER_COLOR_NAMES = ['Red', 'Blue', 'Orange', 'Green', 'Purple', 'Brown'];
 
 export const TERRAIN_COLORS = {
   forest: '#2d6a1e',

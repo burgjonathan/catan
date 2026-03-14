@@ -26,9 +26,9 @@
   --font-display: 'Cinzel', serif;
   --font-body: 'Lato', sans-serif;
 
-  --panel-bg: linear-gradient(160deg, rgba(30, 22, 10, 0.92), rgba(18, 12, 5, 0.95));
-  --panel-bg-flat: rgba(25, 18, 8, 0.92);
-  --panel-border: rgba(140, 100, 50, 0.2);
+  --panel-bg: linear-gradient(160deg, rgba(35, 26, 12, 0.94), rgba(22, 15, 6, 0.96), rgba(15, 10, 4, 0.97));
+  --panel-bg-flat: rgba(25, 18, 8, 0.94);
+  --panel-border: rgba(160, 115, 55, 0.25);
   --panel-radius: 12px;
 }
 
@@ -40,12 +40,24 @@
 
 body {
   font-family: var(--font-body);
-  background: linear-gradient(135deg, #0a3a6a, #0d4a7a, #1565a8, #0d4a7a, #0a3a6a);
+  background: linear-gradient(135deg, #071e3d, #0a3155, #0d4a7a, #115a90, #0d4a7a, #0a3155, #071e3d);
+  background-size: 400% 400%;
+  animation: oceanDrift 20s ease-in-out infinite;
   color: #e8dcc8;
   overflow: hidden;
   height: 100vh;
   height: 100dvh;
   width: 100vw;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@keyframes oceanDrift {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 50% 0%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 100%; }
 }
 
 #root {
@@ -59,7 +71,7 @@ button {
   cursor: pointer;
   border: none;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 button:disabled {
@@ -77,12 +89,17 @@ input {
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(180, 140, 80, 0.3);
+  background: linear-gradient(180deg, rgba(200, 150, 70, 0.4), rgba(160, 110, 50, 0.3));
   border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(220, 170, 80, 0.5), rgba(180, 130, 60, 0.4));
 }
 
 .btn {
@@ -103,8 +120,13 @@ input {
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(200, 120, 20, 0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 6px 20px rgba(200, 120, 20, 0.6), 0 2px 8px rgba(230, 150, 40, 0.3), inset 0 1px 0 rgba(255,255,255,0.25);
   background: linear-gradient(135deg, #d47a18, #f0982a, #d47a18);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(200, 120, 20, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
 .btn-secondary {
@@ -116,6 +138,8 @@ input {
 .btn-secondary:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.14);
   border-color: rgba(200, 150, 70, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .btn-danger {

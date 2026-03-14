@@ -56,6 +56,12 @@
   box-shadow: 0 0 4px rgba(255,255,255,0.15);
 }
 
+.score-avatar {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .score-name {
   font-size: 12px;
   font-weight: 700;
@@ -113,4 +119,24 @@
 .score-badge.army {
   background: rgba(231, 76, 60, 0.3);
   color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+  .scoreboard {
+    padding: 4px 8px;
+  }
+  .score-entry {
+    min-width: 100px;
+    padding: 6px 8px;
+    border-radius: 8px;
+  }
+  .score-name {
+    font-size: 10px;
+  }
+  .score-vp {
+    font-size: 14px;
+  }
+  .score-badges {
+    display: none;
+  }
 }

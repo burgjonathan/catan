@@ -43,7 +43,31 @@ export function useGameActions() {
     createBotGame: (playerName, botCount, difficulty) =>
       socket?.emit(C2S.CREATE_BOT_GAME, { playerName, sessionId, botCount, difficulty }),
 
+    rematch: () => socket?.emit(C2S.REMATCH),
+    spectateRandom: (spectatorName) => socket?.emit(C2S.SPECTATE_RANDOM, { spectatorName }),
+    leaveSpectate: () => {
+      socket?.emit(C2S.LEAVE_SPECTATE);
+      dispatch({ type: 'RESET' });
+    },
+
     sendChat: (text) => socket?.emit(C2S.CHAT_MESSAGE, { text }),
+
+    undoRequest: () => socket?.emit(C2S.UNDO_REQUEST),
+    undoAccept: () => socket?.emit(C2S.UNDO_ACCEPT),
+    undoReject: () => socket?.emit(C2S.UNDO_REJECT),
+
+    getFriendCode: (playerName) => socket?.emit(C2S.GET_FRIEND_CODE, { sessionId, playerName }),
+    getFriends: () => socket?.emit(C2S.GET_FRIENDS, { sessionId }),
+    addFriend: (friendCode) => socket?.emit(C2S.ADD_FRIEND, { sessionId, friendCode }),
+    removeFriend: (targetSession) => socket?.emit(C2S.REMOVE_FRIEND, { sessionId, targetSession }),
+    inviteFriend: (targetSession) => socket?.emit(C2S.INVITE_FRIEND, { sessionId, targetSession }),
+    dismissInvite: () => dispatch({ type: 'DISMISS_INVITE' }),
+
+    getAchievements: () => socket?.emit(C2S.GET_ACHIEVEMENTS, { sessionId }),
+    dismissAchievements: () => dispatch({ type: 'DISMISS_ACHIEVEMENTS' }),
+
+    setProfile: (playerName, avatar) => socket?.emit(C2S.SET_PROFILE, { sessionId, playerName, avatar }),
+    getProfile: () => socket?.emit(C2S.GET_PROFILE, { sessionId }),
 
     setPendingAction: (action) => dispatch({ type: 'SET_PENDING_ACTION', payload: action }),
     clearError: () => dispatch({ type: 'CLEAR_ERROR' }),

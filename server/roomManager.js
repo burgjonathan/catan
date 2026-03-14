@@ -1,6 +1,7 @@
 import { PLAYER_COLORS, PLAYER_COLOR_NAMES } from '../shared/constants.js';
 import { createBotPlayer } from './botPlayer.js';
 import { pickBotNames } from './botNames.js';
+import * as friendsManager from './friendsManager.js';
 
 const rooms = new Map();
 const disconnectTimers = new Map(); // sessionId -> timeout handle
@@ -19,12 +20,14 @@ function generateCode() {
 
 export function createRoom(hostSocketId, hostName, sessionId) {
   const code = generateCode();
+  const avatar = sessionId ? friendsManager.getAvatar(sessionId) : null;
   const room = {
     code,
     players: [{
       id: hostSocketId,
       sessionId,
       name: hostName,
+      avatar: avatar || null,
       color: PLAYER_COLORS[0],
       colorName: PLAYER_COLOR_NAMES[0],
       isHost: true
@@ -39,6 +42,7 @@ export function createRoom(hostSocketId, hostName, sessionId) {
 
 export function createPublicRoom(hostSocketId, hostName, sessionId) {
   const code = generateCode();
+  const avatar = sessionId ? friendsManager.getAvatar(sessionId) : null;
   const room = {
     code,
     isPublic: true,
@@ -46,6 +50,7 @@ export function createPublicRoom(hostSocketId, hostName, sessionId) {
       id: hostSocketId,
       sessionId,
       name: hostName,
+      avatar: avatar || null,
       color: PLAYER_COLORS[0],
       colorName: PLAYER_COLOR_NAMES[0],
       isHost: true
@@ -87,14 +92,17 @@ export function joinRoom(code, socketId, playerName, sessionId) {
   const room = rooms.get(code);
   if (!room) throw new Error('Room not found');
   if (room.status !== 'waiting') throw new Error('Game already in progress');
-  if (room.players.length >= 4) throw new Error('Room is full');
+  const maxPlayers = room.isPublic ? 4 : 6;
+  if (room.players.length >= maxPlayers) throw new Error('Room is full');
   if (room.players.some(p => p.id === socketId)) throw new Error('Already in room');
 
   const colorIndex = room.players.length;
+  const avatar = sessionId ? friendsManager.getAvatar(sessionId) : null;
   room.players.push({
     id: socketId,
     sessionId,
     name: playerName,
+    avatar: avatar || null,
     color: PLAYER_COLORS[colorIndex],
     colorName: PLAYER_COLOR_NAMES[colorIndex],
     isHost: false
@@ -210,7 +218,7 @@ export function cancelDisconnectTimer(sessionId) {
 export function addBotsToRoom(code, botCount, difficulty) {
   const room = rooms.get(code);
   if (!room) throw new Error('Room not found');
-  if (room.players.length + botCount > 4) throw new Error('Too many players');
+  if (room.players.length + botCount > 6) throw new Error('Too many players');
 
   const names = pickBotNames(botCount);
   for (let i = 0; i < botCount; i++) {
@@ -234,4 +242,39 @@ export function updateGameState(code, gameState) {
   if (room) {
     room.gameState = gameState;
   }
+}
+
+export function addSpectator(code, socketId, name) {
+  const room = rooms.get(code);
+  if (!room) throw new Error('Room not found');
+  if (!room.spectators) room.spectators = [];
+  if (room.spectators.some(s => s.id === socketId)) throw new Error('Already spectating');
+  room.spectators.push({ id: socketId, name });
+  return { room };
+}
+
+export function removeSpectator(code, socketId) {
+  const room = rooms.get(code);
+  if (!room || !room.spectators) return;
+  room.spectators = room.spectators.filter(s => s.id !== socketId);
+}
+
+export function findSpectatableRoom() {
+  const active = [];
+  for (const [code, room] of rooms) {
+    if (room.status === 'playing' && room.gameState && room.gameState.phase !== 'finished') {
+      active.push({ code, room });
+    }
+  }
+  if (active.length === 0) return null;
+  return active[Math.floor(Math.random() * active.length)];
+}
+
+export function getRoomBySpectator(socketId) {
+  for (const [code, room] of rooms) {
+    if (room.spectators && room.spectators.some(s => s.id === socketId)) {
+      return { code, room };
+    }
+  }
+  return null;
 }

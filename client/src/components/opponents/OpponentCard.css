@@ -28,6 +28,12 @@
   box-shadow: 0 0 4px rgba(255,255,255,0.2);
 }
 
+.opponent-avatar {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .opponent-name {
   font-weight: 700;
   font-size: 13px;

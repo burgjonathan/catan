@@ -1,0 +1,85 @@
+.achievement-toast-container {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.achievement-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(30, 22, 10, 0.92);
+  border: 2px solid #f1c40f;
+  border-radius: var(--panel-radius, 12px);
+  padding: 14px 22px;
+  min-width: 280px;
+  max-width: 400px;
+  cursor: pointer;
+  animation: achievementSlideDown 0.5s ease forwards;
+  box-shadow: 0 0 20px rgba(241, 196, 15, 0.3), 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.achievement-toast.dismissing {
+  animation: achievementSlideUp 0.3s ease forwards;
+}
+
+@keyframes achievementSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes achievementSlideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+
+.achievement-toast-icon {
+  font-size: 36px;
+  flex-shrink: 0;
+}
+
+.achievement-toast-content {
+  flex: 1;
+}
+
+.achievement-toast-label {
+  font-family: var(--font-display, serif);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #f1c40f;
+  margin-bottom: 2px;
+}
+
+.achievement-toast-name {
+  font-family: var(--font-display, serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.achievement-toast-desc {
+  font-family: var(--font-body, sans-serif);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}

@@ -11,8 +11,21 @@ for (let q = -2; q <= 2; q++) {
   }
 }
 
-export function isValidHex(q, r) {
-  return Math.abs(q) <= 2 && Math.abs(r) <= 2 && Math.abs(q + r) <= 2;
+// Generate hex positions for any board radius
+export function hexPositionsForRadius(radius) {
+  const positions = [];
+  for (let q = -radius; q <= radius; q++) {
+    for (let r = -radius; r <= radius; r++) {
+      if (Math.abs(q + r) <= radius) {
+        positions.push({ q, r });
+      }
+    }
+  }
+  return positions;
+}
+
+export function isValidHex(q, r, radius = 2) {
+  return Math.abs(q) <= radius && Math.abs(r) <= radius && Math.abs(q + r) <= radius;
 }
 
 // Convert axial (q, r) to pixel position for flat-top hex
@@ -64,23 +77,31 @@ const CORNER_EQUIVALENCES = [
 ];
 
 // Generate canonical vertex key from hex (q,r) and corner index (0-5)
-export function vertexKey(q, r, cornerIndex) {
+// Optional hexPositions parameter to validate against a specific board
+export function vertexKey(q, r, cornerIndex, hexPositions) {
+  const radius = hexPositions ? null : 2;
   const equivs = CORNER_EQUIVALENCES[cornerIndex];
   const candidates = equivs
     .map(e => ({ q: q + e.dq, r: r + e.dr, c: e.c }))
-    .filter(v => isValidHex(v.q, v.r));
+    .filter(v => {
+      if (hexPositions) {
+        return hexPositions.some(h => h.q === v.q && h.r === v.r);
+      }
+      return isValidHex(v.q, v.r, radius);
+    });
 
   candidates.sort((a, b) => a.q - b.q || a.r - b.r || a.c - b.c);
   const v = candidates[0];
   return `${v.q},${v.r},${v.c}`;
 }
 
-// Get all 54 unique vertex keys
-export function getAllVertices() {
+// Get all unique vertex keys
+export function getAllVertices(hexPositions) {
+  const positions = hexPositions || HEX_POSITIONS;
   const vertexSet = new Set();
-  for (const { q, r } of HEX_POSITIONS) {
+  for (const { q, r } of positions) {
     for (let c = 0; c < 6; c++) {
-      vertexSet.add(vertexKey(q, r, c));
+      vertexSet.add(vertexKey(q, r, c, hexPositions));
     }
   }
   return Array.from(vertexSet);
@@ -91,13 +112,14 @@ export function edgeKey(vKey1, vKey2) {
   return vKey1 < vKey2 ? `${vKey1}|${vKey2}` : `${vKey2}|${vKey1}`;
 }
 
-// Get all 72 unique edge keys
-export function getAllEdges() {
+// Get all unique edge keys
+export function getAllEdges(hexPositions) {
+  const positions = hexPositions || HEX_POSITIONS;
   const edgeSet = new Set();
-  for (const { q, r } of HEX_POSITIONS) {
+  for (const { q, r } of positions) {
     for (let c = 0; c < 6; c++) {
-      const v1 = vertexKey(q, r, c);
-      const v2 = vertexKey(q, r, (c + 1) % 6);
+      const v1 = vertexKey(q, r, c, hexPositions);
+      const v2 = vertexKey(q, r, (c + 1) % 6, hexPositions);
       edgeSet.add(edgeKey(v1, v2));
     }
   }
@@ -105,16 +127,17 @@ export function getAllEdges() {
 }
 
 // Get the 6 vertex keys for a hex
-export function getVerticesForHex(q, r) {
-  return [0, 1, 2, 3, 4, 5].map(c => vertexKey(q, r, c));
+export function getVerticesForHex(q, r, hexPositions) {
+  return [0, 1, 2, 3, 4, 5].map(c => vertexKey(q, r, c, hexPositions));
 }
 
 // Get hexes that touch a given vertex
-export function getHexesForVertex(vKey) {
+export function getHexesForVertex(vKey, hexPositions) {
+  const positions = hexPositions || HEX_POSITIONS;
   const hexes = [];
-  for (const { q, r } of HEX_POSITIONS) {
+  for (const { q, r } of positions) {
     for (let c = 0; c < 6; c++) {
-      if (vertexKey(q, r, c) === vKey) {
+      if (vertexKey(q, r, c, hexPositions) === vKey) {
         hexes.push({ q, r });
         break;
       }
@@ -124,13 +147,14 @@ export function getHexesForVertex(vKey) {
 }
 
 // Get adjacent vertices (connected by one edge)
-export function getAdjacentVertices(vKey) {
+export function getAdjacentVertices(vKey, hexPositions) {
+  const positions = hexPositions || HEX_POSITIONS;
   const adjacent = new Set();
-  for (const { q, r } of HEX_POSITIONS) {
+  for (const { q, r } of positions) {
     for (let c = 0; c < 6; c++) {
-      if (vertexKey(q, r, c) === vKey) {
-        adjacent.add(vertexKey(q, r, (c + 5) % 6));
-        adjacent.add(vertexKey(q, r, (c + 1) % 6));
+      if (vertexKey(q, r, c, hexPositions) === vKey) {
+        adjacent.add(vertexKey(q, r, (c + 5) % 6, hexPositions));
+        adjacent.add(vertexKey(q, r, (c + 1) % 6, hexPositions));
       }
     }
   }
@@ -139,8 +163,8 @@ export function getAdjacentVertices(vKey) {
 }
 
 // Get edges connected to a vertex
-export function getEdgesForVertex(vKey) {
-  const adj = getAdjacentVertices(vKey);
+export function getEdgesForVertex(vKey, hexPositions) {
+  const adj = getAdjacentVertices(vKey, hexPositions);
   return adj.map(av => edgeKey(vKey, av));
 }
 
@@ -160,10 +184,11 @@ export function edgeVertices(eKey) {
 }
 
 // Compute SVG viewBox for the board
-export function computeViewBox(hexSize, padding = 50) {
+export function computeViewBox(hexSize, padding = 50, hexPositions) {
+  const positions = hexPositions || HEX_POSITIONS;
   let minX = Infinity, maxX = -Infinity;
   let minY = Infinity, maxY = -Infinity;
-  for (const { q, r } of HEX_POSITIONS) {
+  for (const { q, r } of positions) {
     const { x, y } = axialToPixel(q, r, hexSize);
     minX = Math.min(minX, x - hexSize * 1.2);
     maxX = Math.max(maxX, x + hexSize * 1.2);

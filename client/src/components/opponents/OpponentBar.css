@@ -8,3 +8,10 @@
   overflow-x: auto;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 }
+
+@media (max-width: 768px) {
+  .opponent-bar {
+    gap: 4px;
+    padding: 4px 8px;
+  }
+}

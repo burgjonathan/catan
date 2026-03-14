@@ -3,9 +3,10 @@ export default function TerrainDefs() {
   return (
     <defs>
       {/* ─── FOREST ─── */}
-      <radialGradient id="forest-bg" cx="50%" cy="50%" r="60%">
-        <stop offset="0%" stopColor="#3a8a28" />
-        <stop offset="100%" stopColor="#1e5a12" />
+      <radialGradient id="forest-bg" cx="45%" cy="40%" r="65%">
+        <stop offset="0%" stopColor="#4a9a35" />
+        <stop offset="40%" stopColor="#3a8a28" />
+        <stop offset="100%" stopColor="#1a5510" />
       </radialGradient>
       <pattern id="forest-pattern" width="24" height="28" patternUnits="userSpaceOnUse">
         {/* Pine trees scattered */}
@@ -17,9 +18,10 @@ export default function TerrainDefs() {
       </pattern>
 
       {/* ─── HILLS ─── */}
-      <radialGradient id="hills-bg" cx="40%" cy="40%" r="65%">
-        <stop offset="0%" stopColor="#d4763a" />
-        <stop offset="100%" stopColor="#8a4a18" />
+      <radialGradient id="hills-bg" cx="42%" cy="38%" r="68%">
+        <stop offset="0%" stopColor="#e08040" />
+        <stop offset="35%" stopColor="#d4763a" />
+        <stop offset="100%" stopColor="#7a4015" />
       </radialGradient>
       <pattern id="hills-pattern" width="20" height="12" patternUnits="userSpaceOnUse">
         {/* Brick rows */}
@@ -31,9 +33,10 @@ export default function TerrainDefs() {
       </pattern>
 
       {/* ─── PASTURE ─── */}
-      <radialGradient id="pasture-bg" cx="50%" cy="50%" r="60%">
-        <stop offset="0%" stopColor="#98e060" />
-        <stop offset="100%" stopColor="#5aaa30" />
+      <radialGradient id="pasture-bg" cx="48%" cy="42%" r="65%">
+        <stop offset="0%" stopColor="#a8e870" />
+        <stop offset="35%" stopColor="#90d858" />
+        <stop offset="100%" stopColor="#4a9a28" />
       </radialGradient>
       <pattern id="pasture-pattern" width="30" height="30" patternUnits="userSpaceOnUse">
         {/* Grass tufts */}
@@ -45,9 +48,10 @@ export default function TerrainDefs() {
       </pattern>
 
       {/* ─── FIELDS ─── */}
-      <radialGradient id="fields-bg" cx="50%" cy="50%" r="60%">
-        <stop offset="0%" stopColor="#f5e050" />
-        <stop offset="100%" stopColor="#c8a020" />
+      <radialGradient id="fields-bg" cx="48%" cy="42%" r="65%">
+        <stop offset="0%" stopColor="#fae858" />
+        <stop offset="35%" stopColor="#f0d848" />
+        <stop offset="100%" stopColor="#b89018" />
       </radialGradient>
       <pattern id="fields-pattern" width="12" height="24" patternUnits="userSpaceOnUse">
         {/* Wheat stalks */}
@@ -58,9 +62,10 @@ export default function TerrainDefs() {
       </pattern>
 
       {/* ─── MOUNTAINS ─── */}
-      <radialGradient id="mountains-bg" cx="50%" cy="40%" r="65%">
-        <stop offset="0%" stopColor="#9a9a9a" />
-        <stop offset="100%" stopColor="#505050" />
+      <radialGradient id="mountains-bg" cx="48%" cy="38%" r="68%">
+        <stop offset="0%" stopColor="#aaaaaa" />
+        <stop offset="35%" stopColor="#8a8a8a" />
+        <stop offset="100%" stopColor="#454545" />
       </radialGradient>
       <pattern id="mountains-pattern" width="36" height="36" patternUnits="userSpaceOnUse">
         {/* Rocky facets */}
@@ -73,9 +78,10 @@ export default function TerrainDefs() {
       </pattern>
 
       {/* ─── DESERT ─── */}
-      <radialGradient id="desert-bg" cx="50%" cy="50%" r="60%">
-        <stop offset="0%" stopColor="#f0dca8" />
-        <stop offset="100%" stopColor="#d4b878" />
+      <radialGradient id="desert-bg" cx="48%" cy="42%" r="65%">
+        <stop offset="0%" stopColor="#f8e4b8" />
+        <stop offset="35%" stopColor="#f0dca8" />
+        <stop offset="100%" stopColor="#c8a868" />
       </radialGradient>
       <pattern id="desert-pattern" width="40" height="20" patternUnits="userSpaceOnUse">
         {/* Sand dune waves */}
@@ -88,27 +94,52 @@ export default function TerrainDefs() {
       </pattern>
 
       {/* ─── OCEAN WATER ─── */}
-      <radialGradient id="ocean-bg" cx="50%" cy="50%" r="70%">
-        <stop offset="0%" stopColor="#1a7acc" />
-        <stop offset="100%" stopColor="#0d4a7a" />
+      <radialGradient id="ocean-bg" cx="50%" cy="45%" r="75%">
+        <stop offset="0%" stopColor="#2088d8" />
+        <stop offset="40%" stopColor="#1a7acc" />
+        <stop offset="100%" stopColor="#0a3d6a" />
       </radialGradient>
       <pattern id="ocean-pattern" width="60" height="20" patternUnits="userSpaceOnUse">
-        <path d="M0,10 Q15,4 30,10 Q45,16 60,10" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
-        <path d="M-10,18 Q5,12 20,18 Q35,24 50,18" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <path d="M0,10 Q15,4 30,10 Q45,16 60,10" fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1.5" />
+        <path d="M-10,18 Q5,12 20,18 Q35,24 50,18" fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="1" />
+        <path d="M5,4 Q20,-1 35,4 Q50,9 65,4" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />
       </pattern>
 
       {/* ─── HEX BORDER GRADIENT ─── */}
       <linearGradient id="hex-border" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#a08050" />
-        <stop offset="50%" stopColor="#c8a060" />
-        <stop offset="100%" stopColor="#806030" />
+        <stop offset="0%" stopColor="#c0984a" />
+        <stop offset="30%" stopColor="#d4b060" />
+        <stop offset="50%" stopColor="#e0c070" />
+        <stop offset="70%" stopColor="#d4b060" />
+        <stop offset="100%" stopColor="#907030" />
       </linearGradient>
 
       {/* ─── NUMBER TOKEN ─── */}
-      <radialGradient id="token-bg" cx="40%" cy="35%" r="60%">
-        <stop offset="0%" stopColor="#faf4e0" />
-        <stop offset="100%" stopColor="#e8d8b0" />
+      <radialGradient id="token-bg" cx="38%" cy="32%" r="62%">
+        <stop offset="0%" stopColor="#fffdf0" />
+        <stop offset="50%" stopColor="#f8f0d8" />
+        <stop offset="100%" stopColor="#e0d0a8" />
       </radialGradient>
+
+      {/* ─── HEX VIGNETTE ─── depth effect for tiles */}
+      <radialGradient id="hex-vignette" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#000" stopOpacity="0" />
+        <stop offset="60%" stopColor="#000" stopOpacity="0" />
+        <stop offset="100%" stopColor="#000" stopOpacity="0.5" />
+      </radialGradient>
+
+      {/* ─── HEX INNER GLOW ─── subtle light effect */}
+      <radialGradient id="hex-inner-glow" cx="45%" cy="40%" r="55%">
+        <stop offset="0%" stopColor="#fff" stopOpacity="0.12" />
+        <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+      </radialGradient>
+
+      {/* ─── TOKEN HIGHLIGHT ARC ─── specular on number tokens */}
+      <linearGradient id="token-highlight" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#fff" stopOpacity="0.5" />
+        <stop offset="50%" stopColor="#fff" stopOpacity="0.05" />
+        <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+      </linearGradient>
 
       {/* ─── ROBBER GRADIENT ─── */}
       <radialGradient id="robber-body" cx="40%" cy="30%" r="60%">
@@ -117,8 +148,15 @@ export default function TerrainDefs() {
       </radialGradient>
 
       {/* ─── SETTLEMENT / CITY SHADING ─── */}
-      <filter id="piece-shadow" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodOpacity="0.5" />
+      <filter id="piece-shadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="blur" />
+        <feOffset in="blur" dx="1" dy="2" result="offsetBlur" />
+        <feFlood floodColor="#000" floodOpacity="0.45" result="color" />
+        <feComposite in="color" in2="offsetBlur" operator="in" result="shadow" />
+        <feMerge>
+          <feMergeNode in="shadow" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
       </filter>
 
       {/* Port dock gradient */}

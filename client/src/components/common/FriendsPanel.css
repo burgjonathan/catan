@@ -1,0 +1,219 @@
+.friends-panel-wrap {
+  position: relative;
+}
+
+.friends-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--panel-bg-flat);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.friends-toggle-btn:hover {
+  border-color: #e2a84b;
+  transform: translateY(-1px);
+}
+
+.friends-online-badge {
+  background: #27ae60;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.friends-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 300px;
+  background: linear-gradient(135deg, rgba(30, 20, 10, 0.97), rgba(50, 35, 20, 0.97));
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: friendsSlideIn 0.2s ease;
+  overflow: hidden;
+}
+
+@keyframes friendsSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.friends-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.friends-header h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: #f1c40f;
+}
+
+.friends-close-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.friends-close-btn:hover {
+  color: #fff;
+}
+
+.friends-code-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.friends-code-section label,
+.friends-add-section label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 6px;
+}
+
+.friends-code-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.friends-code {
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #f1c40f;
+}
+
+.friends-add-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.friends-add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.friends-add-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #fff;
+  font-family: monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.friends-add-input:focus {
+  border-color: #e2a84b;
+}
+
+.friends-add-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0;
+  text-transform: none;
+  font-family: var(--font-body);
+}
+
+.friends-list-section {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.friends-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+}
+
+.friends-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+}
+
+.friends-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  transition: background 0.15s;
+}
+
+.friends-list-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.friends-list-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.friends-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.friends-status-dot.online {
+  background: #27ae60;
+  box-shadow: 0 0 6px rgba(39, 174, 96, 0.5);
+}
+
+.friends-status-dot.offline {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.friends-name {
+  font-size: 14px;
+  color: #fff;
+}
+
+.friends-list-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-xs {
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  min-height: 0 !important;
+}

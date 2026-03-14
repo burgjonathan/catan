@@ -5,6 +5,7 @@ export default function OpponentCard({ player, isCurrentTurn, hasLongestRoad, ha
     <div className={`opponent-card ${isCurrentTurn ? 'active-turn' : ''}`}>
       <div className="opponent-header">
         <div className="opponent-color" style={{ background: player.color }} />
+        {player.avatar && <span className="opponent-avatar">{player.avatar}</span>}
         <span className="opponent-name">{player.name}{player.isBot ? ' [BOT]' : ''}</span>
       </div>
       <div className="opponent-stats">

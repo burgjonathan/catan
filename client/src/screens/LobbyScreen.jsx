@@ -4,6 +4,8 @@ import { useGame } from '../context/GameContext';
 import { useSocketContext } from '../context/SocketContext';
 import { generateDemoGameState, TUTORIAL_PLAYER_ID } from '../utils/demoGameState';
 import { isAdmin } from './AdminDashboard';
+import FriendsPanel from '../components/common/FriendsPanel';
+import ProfileSetup from '../components/common/ProfileSetup';
 import './LobbyScreen.css';
 
 export default function LobbyScreen({ onShowAdmin }) {
@@ -12,9 +14,28 @@ export default function LobbyScreen({ onShowAdmin }) {
   const [mode, setMode] = useState(null); // null, 'create', 'join', 'bots'
   const [botCount, setBotCount] = useState(1);
   const [botDifficulty, setBotDifficulty] = useState('medium');
+  const [showProfile, setShowProfile] = useState(false);
   const actions = useGameActions();
   const { state, dispatch } = useGame();
   const { connected } = useSocketContext();
+
+  const profile = state.profile;
+  const profileAvatar = profile?.avatar || null;
+
+  // Fetch profile on mount when connected
+  useEffect(() => {
+    if (connected) {
+      actions.getProfile();
+    }
+  }, [connected]);
+
+  // Sync profile name to local state when profile loads
+  useEffect(() => {
+    if (profile?.name && !playerName) {
+      setPlayerName(profile.name);
+      localStorage.setItem('catan_playerName', profile.name);
+    }
+  }, [profile]);
 
   const handleTutorial = () => {
     const gameState = generateDemoGameState();
@@ -41,32 +62,83 @@ export default function LobbyScreen({ onShowAdmin }) {
   const handleCreate = () => {
     if (!playerName.trim()) return;
     saveName(playerName.trim());
+    actions.setProfile(playerName.trim(), profileAvatar);
     actions.createRoom(playerName.trim());
   };
 
   const handleJoin = () => {
     if (!playerName.trim() || !roomCode.trim()) return;
     saveName(playerName.trim());
+    actions.setProfile(playerName.trim(), profileAvatar);
     actions.joinRoom(roomCode.trim().toUpperCase(), playerName.trim());
   };
 
   const handleQuickPlay = () => {
     if (!playerName.trim()) return;
     saveName(playerName.trim());
+    actions.setProfile(playerName.trim(), profileAvatar);
     actions.quickPlay(playerName.trim());
   };
 
   const handleBotGame = () => {
     if (!playerName.trim()) return;
     saveName(playerName.trim());
+    actions.setProfile(playerName.trim(), profileAvatar);
     actions.createBotGame(playerName.trim(), botCount, botDifficulty);
   };
+
+  const handleSpectate = () => {
+    actions.spectateRandom(playerName.trim() || 'Spectator');
+  };
+
+  const handleProfileSave = (name, avatar) => {
+    if (name) {
+      setPlayerName(name);
+      saveName(name);
+    }
+    actions.setProfile(name, avatar);
+    setShowProfile(false);
+  };
+
+  const nameLocked = profile?.nameLocked || false;
+
+  const nameInputSection = (extraProps = {}) => (
+    <div className="lobby-name-input">
+      <label>Your Name</label>
+      <div className="lobby-name-with-avatar">
+        {profileAvatar && (
+          <button className="lobby-avatar-display" onClick={() => setShowProfile(true)} title="Edit Profile">
+            {profileAvatar}
+          </button>
+        )}
+        <input
+          type="text"
+          value={playerName}
+          onChange={e => setPlayerName(e.target.value)}
+          placeholder="Enter your name"
+          maxLength={20}
+          disabled={nameLocked}
+          {...extraProps}
+        />
+        {nameLocked && <span className="lobby-lock-icon">🔒</span>}
+        <button className="lobby-profile-btn" onClick={() => setShowProfile(true)} title="Edit Profile">
+          {profileAvatar ? 'Edit' : 'Avatar'}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="lobby-screen">
       <div className="lobby-bg-hex hex-1" />
       <div className="lobby-bg-hex hex-2" />
       <div className="lobby-bg-hex hex-3" />
+
+      {connected && playerName.trim() && (
+        <div className="lobby-friends-wrap">
+          <FriendsPanel />
+        </div>
+      )}
 
       <div className="lobby-container">
         <div className="lobby-header">
@@ -84,17 +156,7 @@ export default function LobbyScreen({ onShowAdmin }) {
 
         {mode === null && connected && (
           <div className="lobby-actions">
-            <div className="lobby-name-input">
-              <label>Your Name</label>
-              <input
-                type="text"
-                value={playerName}
-                onChange={e => setPlayerName(e.target.value)}
-                placeholder="Enter your name"
-                maxLength={20}
-                onKeyDown={e => e.key === 'Enter' && playerName.trim() && handleQuickPlay()}
-              />
-            </div>
+            {nameInputSection({ onKeyDown: e => e.key === 'Enter' && playerName.trim() && handleQuickPlay() })}
             <button className="btn btn-primary lobby-btn lobby-browse-btn" onClick={handleQuickPlay} disabled={!playerName.trim()}>
               Play Online
             </button>
@@ -112,21 +174,15 @@ export default function LobbyScreen({ onShowAdmin }) {
                 Join by Code
               </button>
             </div>
+            <button className="btn btn-secondary lobby-btn lobby-spectate-btn" onClick={handleSpectate}>
+              Watch a Live Game
+            </button>
           </div>
         )}
 
         {mode === 'create' && connected && (
           <div className="lobby-actions">
-            <div className="lobby-name-input">
-              <label>Your Name</label>
-              <input
-                type="text"
-                value={playerName}
-                onChange={e => setPlayerName(e.target.value)}
-                placeholder="Enter your name"
-                maxLength={20}
-              />
-            </div>
+            {nameInputSection()}
             <button className="btn btn-primary lobby-btn" onClick={handleCreate} disabled={!playerName.trim()}>
               Create Private Game
             </button>
@@ -138,16 +194,7 @@ export default function LobbyScreen({ onShowAdmin }) {
 
         {mode === 'join' && connected && (
           <div className="lobby-actions">
-            <div className="lobby-name-input">
-              <label>Your Name</label>
-              <input
-                type="text"
-                value={playerName}
-                onChange={e => setPlayerName(e.target.value)}
-                placeholder="Enter your name"
-                maxLength={20}
-              />
-            </div>
+            {nameInputSection()}
             <div className="lobby-name-input">
               <label>Room Code</label>
               <input
@@ -171,20 +218,11 @@ export default function LobbyScreen({ onShowAdmin }) {
 
         {mode === 'bots' && connected && (
           <div className="lobby-actions">
-            <div className="lobby-name-input">
-              <label>Your Name</label>
-              <input
-                type="text"
-                value={playerName}
-                onChange={e => setPlayerName(e.target.value)}
-                placeholder="Enter your name"
-                maxLength={20}
-              />
-            </div>
+            {nameInputSection()}
             <div className="lobby-name-input">
               <label>Number of Bots</label>
               <div className="bot-selector">
-                {[1, 2, 3].map(n => (
+                {[1, 2, 3, 4, 5].map(n => (
                   <button
                     key={n}
                     className={`bot-count-btn ${botCount === n ? 'active' : ''}`}
@@ -214,6 +252,9 @@ export default function LobbyScreen({ onShowAdmin }) {
                 ))}
               </div>
             </div>
+            {botCount >= 4 && (
+              <p className="expansion-hint">5-6 player expansion board</p>
+            )}
             <button className="btn btn-primary lobby-btn" onClick={handleBotGame} disabled={!playerName.trim()}>
               Start Game
             </button>
@@ -232,9 +273,17 @@ export default function LobbyScreen({ onShowAdmin }) {
               Analytics
             </button>
           )}
-          <p>2-4 Players / Play vs Bots</p>
+          <p>2-6 Players / Play vs Bots</p>
         </div>
       </div>
+
+      {showProfile && (
+        <ProfileSetup
+          profile={profile}
+          onSave={handleProfileSave}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
     </div>
   );
 }

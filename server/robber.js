@@ -1,8 +1,9 @@
-import { getVerticesForHex } from '../shared/hexGeometry.js';
+import { getVerticesForHex, hexPositionsForRadius } from '../shared/hexGeometry.js';
 import { totalResources } from './bank.js';
 
 export function getPlayersToStealFrom(state, hexQ, hexR, currentPlayerId) {
-  const vertexKeys = getVerticesForHex(hexQ, hexR);
+  const hexPositions = hexPositionsForRadius(state.board.boardRadius || 2);
+  const vertexKeys = getVerticesForHex(hexQ, hexR, hexPositions);
   const targets = new Set();
 
   for (const vKey of vertexKeys) {

@@ -15,6 +15,14 @@ export const initialState = {
   tradeOffer: null,
   winner: null,
   tutorialMode: false,
+  isSpectator: false,
+  friendCode: null,
+  friendsList: [],
+  friendInvite: null,
+  undoRequest: null,
+  profile: null,
+  achievements: [],
+  newAchievements: [],
 };
 
 export function gameReducer(state, action) {
@@ -109,6 +117,86 @@ export function gameReducer(state, action) {
 
     case 'CHAT_MESSAGE':
       return { ...state, chatMessages: [...state.chatMessages, action.payload] };
+
+    case 'SPECTATE_JOINED': {
+      const sp = action.payload;
+      return {
+        ...state,
+        screen: 'playing',
+        roomCode: sp.code,
+        playerId: null,
+        players: sp.players,
+        gameState: sp.gameState,
+        isSpectator: true,
+        error: null
+      };
+    }
+
+    case 'SPECTATE_ERROR':
+      return { ...state, error: action.payload.message };
+
+    case 'FRIEND_CODE':
+      return { ...state, friendCode: action.payload.friendCode };
+
+    case 'FRIENDS_LIST':
+      return { ...state, friendsList: action.payload.friends };
+
+    case 'FRIEND_INVITE':
+      return { ...state, friendInvite: action.payload };
+
+    case 'DISMISS_INVITE':
+      return { ...state, friendInvite: null };
+
+    case 'FRIEND_ERROR':
+      return { ...state, error: action.payload.message };
+
+    case 'FRIEND_ONLINE':
+      return {
+        ...state,
+        friendsList: state.friendsList.map(f =>
+          f.sessionId === action.payload.sessionId ? { ...f, online: true, status: 'online' } : f
+        )
+      };
+
+    case 'FRIEND_OFFLINE':
+      return {
+        ...state,
+        friendsList: state.friendsList.map(f =>
+          f.sessionId === action.payload.sessionId ? { ...f, online: false, status: 'offline' } : f
+        )
+      };
+
+    case 'UNDO_REQUESTED':
+      return { ...state, undoRequest: action.payload };
+
+    case 'UNDO_RESOLVED':
+      return { ...state, undoRequest: null };
+
+    case 'PROFILE_DATA':
+      return { ...state, profile: action.payload };
+
+    case 'PROFILE_ERROR':
+      return { ...state, error: action.payload.message };
+
+    case 'ACHIEVEMENTS_LIST':
+      return { ...state, achievements: action.payload.achievements };
+
+    case 'ACHIEVEMENTS_UNLOCKED': {
+      const newOnes = action.payload.achievements || [];
+      const merged = [...state.achievements];
+      for (const a of newOnes) {
+        const idx = merged.findIndex(e => e.id === a.id);
+        if (idx >= 0) {
+          merged[idx] = { ...merged[idx], unlocked: true, unlockedAt: a.unlockedAt };
+        } else {
+          merged.push({ ...a, unlocked: true });
+        }
+      }
+      return { ...state, achievements: merged, newAchievements: newOnes };
+    }
+
+    case 'DISMISS_ACHIEVEMENTS':
+      return { ...state, newAchievements: [] };
 
     case 'SET_PENDING_ACTION':
       return { ...state, pendingAction: action.payload };

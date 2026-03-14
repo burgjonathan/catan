@@ -1,0 +1,118 @@
+.undo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+  animation: undoFadeIn 0.2s ease;
+}
+
+@keyframes undoFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.undo-modal {
+  background: linear-gradient(135deg, rgba(30, 20, 10, 0.98), rgba(50, 35, 20, 0.98));
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  padding: 28px 32px;
+  min-width: 320px;
+  max-width: 400px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  animation: undoSlideIn 0.25s ease;
+}
+
+@keyframes undoSlideIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.undo-modal-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: #f1c40f;
+  margin: 0 0 12px;
+}
+
+.undo-modal-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 4px;
+  line-height: 1.5;
+}
+
+.undo-modal-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 16px;
+  min-height: 16px;
+}
+
+.undo-votes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.undo-vote-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.undo-vote-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.undo-vote-name {
+  flex: 1;
+  font-size: 14px;
+  color: #fff;
+}
+
+.undo-vote-status {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.undo-vote-status.accepted {
+  color: #27ae60;
+}
+
+.undo-vote-status.rejected {
+  color: #e74c3c;
+}
+
+.undo-vote-status.pending {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.undo-modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.undo-modal-actions .btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+}
+
+.undo-modal-waiting {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  margin: 0;
+}

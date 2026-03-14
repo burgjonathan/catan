@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useGame } from '../../context/GameContext';
 import { RESOURCES, TERRAIN_RESOURCE, RESOURCE_ICONS } from 'shared/constants.js';
-import { getVerticesForHex } from 'shared/hexGeometry.js';
+import { getVerticesForHex, hexPositionsForRadius } from 'shared/hexGeometry.js';
 import './FlyingResources.css';
 
 const FLY_DURATION = 700;
@@ -94,7 +94,8 @@ export default function FlyingResources({ onAnimStart, onAnimEnd }) {
       const resource = TERRAIN_RESOURCE[hex.terrain];
       if (!resource || !remainingGains[resource]) continue;
 
-      const vertices = getVerticesForHex(hex.q, hex.r);
+      const hexPositions = hexPositionsForRadius(board.boardRadius || 2);
+      const vertices = getVerticesForHex(hex.q, hex.r, hexPositions);
       let gained = 0;
       for (const vKey of vertices) {
         const v = board.vertices[vKey];

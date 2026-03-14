@@ -155,7 +155,7 @@ export default function HexTile({ hex, size, clickable, onClick }) {
       {/* Base gradient fill */}
       <polygon
         points={points}
-        fill={TERRAIN_FILLS[hex.terrain]}
+        fill={TERRAIN_FILLS[hex.terrain] || '#333'}
         stroke="url(#hex-border)"
         strokeWidth="2.5"
       />
@@ -167,12 +167,28 @@ export default function HexTile({ hex, size, clickable, onClick }) {
         stroke="none"
         pointerEvents="none"
       />
+      {/* Inner vignette - darker edges for depth */}
+      <polygon
+        points={points}
+        fill="url(#hex-vignette)"
+        opacity="0.3"
+        stroke="none"
+        pointerEvents="none"
+      />
+      {/* Inner glow - subtle light from top-left */}
+      <polygon
+        points={points}
+        fill="url(#hex-inner-glow)"
+        opacity="0.5"
+        stroke="none"
+        pointerEvents="none"
+      />
       {/* Inner highlight edge */}
       <polygon
-        points={corners.map(c => `${center.x + c.x * 0.92},${center.y + c.y * 0.92}`).join(' ')}
+        points={corners.map(c => `${center.x + c.x * 0.93},${center.y + c.y * 0.93}`).join(' ')}
         fill="none"
-        stroke="rgba(255,255,255,0.08)"
-        strokeWidth="1"
+        stroke="rgba(255,255,255,0.1)"
+        strokeWidth="1.2"
         pointerEvents="none"
       />
       {/* Terrain icon */}

@@ -5,13 +5,41 @@
   gap: 6px;
 }
 
+.dice-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .dice-container {
   display: flex;
   gap: 8px;
 }
 
+.undo-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.undo-btn:hover {
+  color: #f1c40f;
+  border-color: rgba(241, 196, 15, 0.5);
+  background: rgba(241, 196, 15, 0.1);
+}
+
 .dice-container.animating {
   animation: shake 0.1s ease infinite;
+  will-change: transform;
 }
 
 @keyframes shake {
@@ -28,10 +56,11 @@
 
 .dice-total {
   font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 800;
   color: #f0c820;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(240, 200, 32, 0.2);
+  letter-spacing: 0.5px;
 }
 
 .roll-btn {

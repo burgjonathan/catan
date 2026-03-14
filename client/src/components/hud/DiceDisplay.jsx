@@ -1,4 +1,5 @@
 import { useDiceRoll } from '../../hooks/useDiceRoll';
+import { useGameActions } from '../../hooks/useGameActions';
 import './DiceDisplay.css';
 
 const DOT_POSITIONS = {
@@ -39,12 +40,25 @@ function Die({ value }) {
 
 export default function DiceDisplay({ diceResult, canRoll, onRoll }) {
   const { displayDice, animating } = useDiceRoll(diceResult);
+  const actions = useGameActions();
 
   return (
     <div className="dice-display">
-      <div className={`dice-container ${animating ? 'animating' : ''}`}>
-        <Die value={displayDice[0]} />
-        <Die value={displayDice[1]} />
+      <div className="dice-row">
+        <div className={`dice-container ${animating ? 'animating' : ''}`}>
+          <Die value={displayDice[0]} />
+          <Die value={displayDice[1]} />
+        </div>
+        <button
+          className="undo-btn"
+          onClick={() => actions.undoRequest()}
+          title="Request Undo"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="1 4 1 10 7 10" />
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+          </svg>
+        </button>
       </div>
       {diceResult && (
         <div className="dice-total">{diceResult.die1 + diceResult.die2}</div>

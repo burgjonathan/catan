@@ -1,7 +1,7 @@
 import { generateBoard } from './boardGenerator.js';
 import { createBank, createEmptyResources, createDevCardDeck, canAfford, deductCost, addResource, totalResources } from './bank.js';
 import { COSTS, TERRAIN_RESOURCE, MAX_SETTLEMENTS, MAX_CITIES, MAX_ROADS, RESOURCES } from '../shared/constants.js';
-import { getVerticesForHex, getAdjacentVertices, getEdgesForVertex, edgeVertices, vertexKey, getAllVertices } from '../shared/hexGeometry.js';
+import { getVerticesForHex, getAdjacentVertices, getEdgesForVertex, edgeVertices, vertexKey, getAllVertices, hexPositionsForRadius } from '../shared/hexGeometry.js';
 import { updateLongestRoad } from './longestRoad.js';
 import { updateLargestArmy } from './largestArmy.js';
 import { checkWinner, calculateVP } from './victoryCheck.js';
@@ -9,14 +9,19 @@ import { getPlayersWhoMustDiscard, getPlayersToStealFrom, stealRandomResource } 
 import { playKnight, playRoadBuilding, playYearOfPlenty, playMonopoly } from './devCards.js';
 import * as trading from './trading.js';
 
-export function createGame(roomPlayers) {
-  const board = generateBoard();
+function getBoardHexPositions(board) {
+  return hexPositionsForRadius(board.boardRadius || 2);
+}
+
+export function createGame(roomPlayers, expansion = false) {
+  const board = generateBoard(expansion);
   const bank = createBank();
   const devCardDeck = createDevCardDeck();
 
   const players = roomPlayers.map(p => ({
     id: p.id,
     name: p.name,
+    avatar: p.avatar || null,
     color: p.color,
     colorName: p.colorName,
     isBot: p.isBot || false,
@@ -112,7 +117,8 @@ export function placeInitialSettlement(state, playerId, vKey) {
   if (vertex.building) throw new Error('Vertex already occupied');
 
   // Distance rule: no adjacent settlements/cities
-  const adjacentVerts = getAdjacentVertices(vKey);
+  const hexPositions = getBoardHexPositions(state.board);
+  const adjacentVerts = getAdjacentVertices(vKey, hexPositions);
   for (const adjV of adjacentVerts) {
     if (state.board.vertices[adjV] && state.board.vertices[adjV].building) {
       throw new Error('Too close to another settlement');
@@ -143,9 +149,10 @@ export function placeInitialSettlement(state, playerId, vKey) {
 }
 
 function getHexesForVertexFromBoard(board, vKey) {
+  const hexPositions = getBoardHexPositions(board);
   const hexes = [];
   for (const hex of board.hexes) {
-    const verts = getVerticesForHex(hex.q, hex.r);
+    const verts = getVerticesForHex(hex.q, hex.r, hexPositions);
     if (verts.includes(vKey)) {
       hexes.push(hex);
     }
@@ -206,6 +213,7 @@ export function rollDice(state, playerId) {
     }
   } else {
     // Distribute resources
+    const hexPositions = getBoardHexPositions(state.board);
     for (const hex of state.board.hexes) {
       if (hex.number !== total) continue;
       if (hex.hasRobber || (hex.q === state.board.robberHex.q && hex.r === state.board.robberHex.r)) continue;
@@ -213,7 +221,7 @@ export function rollDice(state, playerId) {
       const resource = TERRAIN_RESOURCE[hex.terrain];
       if (!resource) continue;
 
-      const vertexKeys = getVerticesForHex(hex.q, hex.r);
+      const vertexKeys = getVerticesForHex(hex.q, hex.r, hexPositions);
       for (const vKey of vertexKeys) {
         const vertex = state.board.vertices[vKey];
         if (vertex && vertex.ownerId) {
@@ -325,7 +333,8 @@ export function buildSettlement(state, playerId, vKey) {
   if (vertex.building) throw new Error('Vertex already occupied');
 
   // Distance rule
-  const adjacentVerts = getAdjacentVertices(vKey);
+  const hexPositions = getBoardHexPositions(state.board);
+  const adjacentVerts = getAdjacentVertices(vKey, hexPositions);
   for (const adjV of adjacentVerts) {
     if (state.board.vertices[adjV] && state.board.vertices[adjV].building) {
       throw new Error('Too close to another settlement');
@@ -333,7 +342,7 @@ export function buildSettlement(state, playerId, vKey) {
   }
 
   // Must connect to player's road network
-  const connectedEdges = getEdgesForVertex(vKey);
+  const connectedEdges = getEdgesForVertex(vKey, hexPositions);
   const hasConnectedRoad = connectedEdges.some(eKey => {
     const edge = state.board.edges[eKey];
     return edge && edge.ownerId === playerId;
@@ -389,11 +398,12 @@ export function buildRoad(state, playerId, eKey) {
   if (edge.road) throw new Error('Road already exists');
 
   // Must connect to player's road/settlement/city
+  const hexPositionsRoad = getBoardHexPositions(state.board);
   const [v1, v2] = edgeVertices(eKey);
   const connected = [v1, v2].some(v => {
     const vert = state.board.vertices[v];
     if (vert && vert.ownerId === playerId) return true;
-    const adjEdges = getEdgesForVertex(v);
+    const adjEdges = getEdgesForVertex(v, hexPositionsRoad);
     return adjEdges.some(ae => {
       const adjEdge = state.board.edges[ae];
       return adjEdge && adjEdge.ownerId === playerId;

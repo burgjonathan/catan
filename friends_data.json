@@ -1,0 +1,33 @@
+{
+  "friendCodes": {
+    "38e44514-c781-42ed-bdf2-b0104a8acdc0": "MSAZT5",
+    "5bc93955-8ddc-482c-a6b7-d55a6f28c74a": "K22QBZ"
+  },
+  "codesToSession": {
+    "MSAZT5": "38e44514-c781-42ed-bdf2-b0104a8acdc0",
+    "K22QBZ": "5bc93955-8ddc-482c-a6b7-d55a6f28c74a"
+  },
+  "friendLists": {
+    "38e44514-c781-42ed-bdf2-b0104a8acdc0": [],
+    "5bc93955-8ddc-482c-a6b7-d55a6f28c74a": []
+  },
+  "playerNames": {
+    "38e44514-c781-42ed-bdf2-b0104a8acdc0": "jonna",
+    "5bc93955-8ddc-482c-a6b7-d55a6f28c74a": "BOB",
+    "8ccb8377-8757-4137-9e59-2c344ad882f4": "test",
+    "da0bcb52-b224-49d5-80f6-1aba2680e1a2": "jo",
+    "632ddc1e-957d-43fe-b25e-2a3ca2e9e15a": "hio"
+  },
+  "playerAvatars": {
+    "38e44514-c781-42ed-bdf2-b0104a8acdc0": "🌮",
+    "5bc93955-8ddc-482c-a6b7-d55a6f28c74a": "🍄",
+    "8ccb8377-8757-4137-9e59-2c344ad882f4": "🐸"
+  },
+  "nameLockedUntil": {
+    "38e44514-c781-42ed-bdf2-b0104a8acdc0": 1775235177822,
+    "5bc93955-8ddc-482c-a6b7-d55a6f28c74a": 1775235271958,
+    "8ccb8377-8757-4137-9e59-2c344ad882f4": 1775235524656,
+    "da0bcb52-b224-49d5-80f6-1aba2680e1a2": 1775235557328,
+    "632ddc1e-957d-43fe-b25e-2a3ca2e9e15a": 1775235667726
+  }
+}

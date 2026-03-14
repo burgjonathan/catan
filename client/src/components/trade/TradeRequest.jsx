@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useGameActions } from '../../hooks/useGameActions';
 import { RESOURCES, RESOURCE_ICONS } from 'shared/constants.js';
 import './TradeRequest.css';
@@ -19,6 +20,18 @@ function ResourceList({ resources, label }) {
 
 export default function TradeRequest({ trade, myResources }) {
   const actions = useGameActions();
+  const [countdown, setCountdown] = useState(30);
+
+  useEffect(() => {
+    setCountdown(30);
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) { clearInterval(interval); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [trade?.id]);
 
   const canAccept = trade.requesting && Object.entries(trade.requesting).every(
     ([r, amount]) => (myResources?.[r] || 0) >= amount
@@ -26,7 +39,10 @@ export default function TradeRequest({ trade, myResources }) {
 
   return (
     <div className="trade-request">
-      <h4>Trade Offer from {trade.fromName}</h4>
+      <div className="trade-req-header">
+        <h4>Trade Offer from {trade.fromName}</h4>
+        <span className={`trade-timer ${countdown <= 10 ? 'urgent' : ''}`}>{countdown}s</span>
+      </div>
 
       <ResourceList resources={trade.offering} label="They give:" />
       <ResourceList resources={trade.requesting} label="They want:" />

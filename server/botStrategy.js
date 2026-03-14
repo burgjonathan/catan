@@ -1,22 +1,27 @@
 import { TERRAIN_RESOURCE, COSTS, RESOURCES, MAX_SETTLEMENTS, MAX_CITIES, MAX_ROADS } from '../shared/constants.js';
-import { getVerticesForHex, getAdjacentVertices, getEdgesForVertex, edgeVertices, getAllVertices } from '../shared/hexGeometry.js';
+import { getVerticesForHex, getAdjacentVertices, getEdgesForVertex, edgeVertices, getAllVertices, hexPositionsForRadius } from '../shared/hexGeometry.js';
 import { canAfford, totalResources } from './bank.js';
 import { calculateVP } from './victoryCheck.js';
+
+function getBoardHexPositions(state) {
+  return hexPositionsForRadius(state.board.boardRadius || 2);
+}
 
 // Probability pips for each dice number
 const PIPS = { 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 0, 8: 5, 9: 4, 10: 3, 11: 2, 12: 1 };
 
-function getHexesForVertex(board, vKey) {
+function getHexesForVertex(board, vKey, hexPositions) {
   const hexes = [];
   for (const hex of board.hexes) {
-    const verts = getVerticesForHex(hex.q, hex.r);
+    const verts = getVerticesForHex(hex.q, hex.r, hexPositions);
     if (verts.includes(vKey)) hexes.push(hex);
   }
   return hexes;
 }
 
 function scoreVertex(board, vKey, playerId, state) {
-  const hexes = getHexesForVertex(board, vKey);
+  const hexPositions = getBoardHexPositions(state);
+  const hexes = getHexesForVertex(board, vKey, hexPositions);
   let score = 0;
   const resourceTypes = new Set();
 
@@ -45,17 +50,18 @@ function scoreVertex(board, vKey, playerId, state) {
 }
 
 function getValidSetupVertices(state) {
-  const allVerts = getAllVertices();
+  const hexPositions = getBoardHexPositions(state);
+  const allVerts = getAllVertices(hexPositions);
   return allVerts.filter(vKey => {
     const vertex = state.board.vertices[vKey];
     if (!vertex || vertex.building) return false;
-    const adj = getAdjacentVertices(vKey);
+    const adj = getAdjacentVertices(vKey, hexPositions);
     return !adj.some(a => state.board.vertices[a] && state.board.vertices[a].building);
   });
 }
 
-function getResourcesForVertex(board, vKey) {
-  const hexes = getHexesForVertex(board, vKey);
+function getResourcesForVertex(board, vKey, hexPositions) {
+  const hexes = getHexesForVertex(board, vKey, hexPositions);
   const resources = new Set();
   for (const hex of hexes) {
     const r = TERRAIN_RESOURCE[hex.terrain];
@@ -77,12 +83,13 @@ export function chooseSetupSettlement(state, botPlayerId, difficulty) {
   scored.sort((a, b) => b.score - a.score);
 
   const bot = state.players.find(p => p.id === botPlayerId);
+  const hexPositions = getBoardHexPositions(state);
 
   // Round 2: boost complementary resources
   if (state.phase === 'setup2' && bot.settlements.length > 0) {
-    const existingResources = getResourcesForVertex(state.board, bot.settlements[0]);
+    const existingResources = getResourcesForVertex(state.board, bot.settlements[0], hexPositions);
     for (const item of scored) {
-      const newResources = getResourcesForVertex(state.board, item.vKey);
+      const newResources = getResourcesForVertex(state.board, item.vKey, hexPositions);
       for (const r of newResources) {
         if (!existingResources.has(r)) item.score += 3;
       }
@@ -110,7 +117,7 @@ export function chooseSetupSettlement(state, botPlayerId, difficulty) {
 
   // Hard: pick best, with extra scoring for resource combos
   for (const item of scored) {
-    const resources = getResourcesForVertex(state.board, item.vKey);
+    const resources = getResourcesForVertex(state.board, item.vKey, hexPositions);
     // Wheat+ore combo for cities
     if (resources.has('wheat') && resources.has('ore')) item.score += 3;
     // Wood+brick for expansion
@@ -122,8 +129,9 @@ export function chooseSetupSettlement(state, botPlayerId, difficulty) {
 
 export function chooseSetupRoad(state, botPlayerId, difficulty) {
   const bot = state.players.find(p => p.id === botPlayerId);
+  const hexPositions = getBoardHexPositions(state);
   const lastSettlement = bot.settlements[bot.settlements.length - 1];
-  const edges = getEdgesForVertex(lastSettlement);
+  const edges = getEdgesForVertex(lastSettlement, hexPositions);
   const validEdges = edges.filter(eKey => {
     const edge = state.board.edges[eKey];
     return edge && !edge.road;
@@ -142,7 +150,7 @@ export function chooseSetupRoad(state, botPlayerId, difficulty) {
 
     // Hard: look one more step ahead
     if (difficulty === 'hard') {
-      const nextEdges = getEdgesForVertex(otherVertex).filter(e => {
+      const nextEdges = getEdgesForVertex(otherVertex, hexPositions).filter(e => {
         const edge = state.board.edges[e];
         return edge && !edge.road && e !== eKey;
       });
@@ -173,9 +181,10 @@ export function chooseRobberHex(state, botPlayerId, difficulty) {
   }
 
   // Score hexes by how much they hurt opponents
+  const hexPositions = getBoardHexPositions(state);
   const scored = validHexes.map(hex => {
     let score = 0;
-    const verts = getVerticesForHex(hex.q, hex.r);
+    const verts = getVerticesForHex(hex.q, hex.r, hexPositions);
     for (const vKey of verts) {
       const vertex = state.board.vertices[vKey];
       if (!vertex || !vertex.ownerId) continue;
@@ -319,15 +328,16 @@ function getBuildPriorities(state, botPlayerId) {
 }
 
 function getValidSettlementSpots(state, playerId) {
-  const allVerts = getAllVertices();
+  const hexPositions = getBoardHexPositions(state);
+  const allVerts = getAllVertices(hexPositions);
   return allVerts.filter(vKey => {
     const vertex = state.board.vertices[vKey];
     if (!vertex || vertex.building) return false;
     // Distance rule
-    const adj = getAdjacentVertices(vKey);
+    const adj = getAdjacentVertices(vKey, hexPositions);
     if (adj.some(a => state.board.vertices[a] && state.board.vertices[a].building)) return false;
     // Must connect to player's road
-    const edges = getEdgesForVertex(vKey);
+    const edges = getEdgesForVertex(vKey, hexPositions);
     return edges.some(eKey => {
       const edge = state.board.edges[eKey];
       return edge && edge.ownerId === playerId;
@@ -336,17 +346,18 @@ function getValidSettlementSpots(state, playerId) {
 }
 
 function getValidRoadSpots(state, playerId) {
+  const hexPositions = getBoardHexPositions(state);
   const bot = state.players.find(p => p.id === playerId);
   const validEdges = [];
   // Check all edges connected to player's network
   const visited = new Set();
   const toCheck = [...bot.roads];
   for (const settlement of bot.settlements) {
-    const edges = getEdgesForVertex(settlement);
+    const edges = getEdgesForVertex(settlement, hexPositions);
     toCheck.push(...edges);
   }
   for (const city of bot.cities) {
-    const edges = getEdgesForVertex(city);
+    const edges = getEdgesForVertex(city, hexPositions);
     toCheck.push(...edges);
   }
 
@@ -361,7 +372,7 @@ function getValidRoadSpots(state, playerId) {
     const connected = [v1, v2].some(v => {
       const vert = state.board.vertices[v];
       if (vert && vert.ownerId === playerId) return true;
-      const adjEdges = getEdgesForVertex(v);
+      const adjEdges = getEdgesForVertex(v, hexPositions);
       return adjEdges.some(ae => {
         const adjEdge = state.board.edges[ae];
         return adjEdge && adjEdge.ownerId === playerId;
@@ -567,6 +578,7 @@ function pickBestRoad(state, botPlayerId, roadSpots, difficulty) {
     return roadSpots[Math.floor(Math.random() * roadSpots.length)];
   }
 
+  const hexPositions = getBoardHexPositions(state);
   // Score roads by what they lead to
   const scored = roadSpots.map(eKey => {
     const [v1, v2] = edgeVertices(eKey);
@@ -575,7 +587,7 @@ function pickBestRoad(state, botPlayerId, roadSpots, difficulty) {
       const vertex = state.board.vertices[v];
       if (!vertex || vertex.building) continue;
       // Check if this vertex is a valid settlement spot
-      const adj = getAdjacentVertices(v);
+      const adj = getAdjacentVertices(v, hexPositions);
       const noNeighbors = !adj.some(a => state.board.vertices[a] && state.board.vertices[a].building);
       if (noNeighbors) {
         score += scoreVertex(state.board, v, botPlayerId, state);

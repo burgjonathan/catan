@@ -2,11 +2,12 @@ import { useGame } from '../../context/GameContext';
 import { VP_TO_WIN } from 'shared/constants.js';
 import './ScoreBoard.css';
 
-function ScoreEntry({ name, color, vp, isCurrentTurn, badges, align }) {
+function ScoreEntry({ name, avatar, color, vp, isCurrentTurn, badges, align }) {
   return (
     <div className={`score-entry ${isCurrentTurn ? 'current-turn' : ''} ${align}`}>
       <div className="score-entry-header">
         <div className="score-color" style={{ background: color }} />
+        {avatar && <span className="score-avatar">{avatar}</span>}
         <span className="score-name">{name}</span>
         <span className="score-vp">{vp}</span>
       </div>
@@ -68,6 +69,7 @@ export default function ScoreBoard() {
           <ScoreEntry
             key={p.id}
             name={p.isBot ? `${p.name} [BOT]` : p.name}
+            avatar={p.avatar}
             color={p.color}
             vp={getVP(p, p.id)}
             isCurrentTurn={currentPlayerId === p.id}
@@ -80,6 +82,7 @@ export default function ScoreBoard() {
         {myPlayer && (
           <ScoreEntry
             name="You"
+            avatar={myPlayer.avatar}
             color={myPlayer.color}
             vp={getVP(myPlayer, playerId)}
             isCurrentTurn={currentPlayerId === playerId}

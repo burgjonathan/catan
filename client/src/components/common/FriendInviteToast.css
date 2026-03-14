@@ -1,0 +1,39 @@
+.friend-invite-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  animation: inviteSlideIn 0.3s ease;
+}
+
+@keyframes inviteSlideIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.friend-invite-content {
+  background: linear-gradient(135deg, rgba(30, 20, 10, 0.97), rgba(50, 35, 20, 0.97));
+  border: 1px solid #e2a84b;
+  border-radius: var(--panel-radius);
+  padding: 16px 20px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 220px;
+}
+
+.friend-invite-text {
+  font-size: 14px;
+  color: #fff;
+}
+
+.friend-invite-text strong {
+  color: #f1c40f;
+}
+
+.friend-invite-actions {
+  display: flex;
+  gap: 8px;
+}

@@ -160,7 +160,7 @@ export function generateDemoGameState() {
   }
 
   return {
-    board: { hexes, ports, vertices, edges, robberHex },
+    board: { hexes, ports, vertices, edges, robberHex, boardRadius: 2 },
     players,
     currentPlayerIndex: 0,
     phase: 'main',

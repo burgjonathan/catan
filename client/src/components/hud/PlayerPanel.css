@@ -39,3 +39,17 @@
   white-space: nowrap;
   font-family: var(--font-display);
 }
+
+@media (max-width: 768px) {
+  .player-panel {
+    padding: 6px 8px;
+  }
+  .player-panel-content {
+    gap: 8px;
+    min-height: 60px;
+  }
+  .end-turn-btn {
+    padding: 8px 14px;
+    font-size: 11px;
+  }
+}

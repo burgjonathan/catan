@@ -35,6 +35,26 @@ export const C2S = {
 
   REJOIN: 'room:rejoin',
   CREATE_BOT_GAME: 'room:createBotGame',
+
+  SPECTATE_RANDOM: 'room:spectateRandom',
+  LEAVE_SPECTATE: 'room:leaveSpectate',
+  REMATCH: 'game:rematch',
+
+  GET_FRIEND_CODE: 'friends:getCode',
+  GET_FRIENDS: 'friends:getList',
+  ADD_FRIEND: 'friends:add',
+  REMOVE_FRIEND: 'friends:remove',
+  INVITE_FRIEND: 'friends:invite',
+  INVITE_RESPOND: 'friends:inviteRespond',
+
+  UNDO_REQUEST: 'game:undoRequest',
+  UNDO_ACCEPT: 'game:undoAccept',
+  UNDO_REJECT: 'game:undoReject',
+
+  SET_PROFILE: 'profile:set',
+  GET_PROFILE: 'profile:get',
+
+  GET_ACHIEVEMENTS: 'achievements:get',
 };
 
 // Server -> Client events
@@ -62,4 +82,24 @@ export const S2C = {
   PUBLIC_ROOM_LIST: 'lobby:roomList',
 
   REJOIN_SUCCESS: 'room:rejoinSuccess',
+
+  SPECTATE_JOINED: 'room:spectateJoined',
+  SPECTATE_STATE: 'room:spectateState',
+  SPECTATE_ERROR: 'room:spectateError',
+
+  FRIEND_CODE: 'friends:code',
+  FRIENDS_LIST: 'friends:list',
+  FRIEND_ERROR: 'friends:error',
+  FRIEND_INVITE: 'friends:invited',
+  FRIEND_ONLINE: 'friends:online',
+  FRIEND_OFFLINE: 'friends:offline',
+
+  UNDO_REQUESTED: 'game:undoRequested',
+  UNDO_RESOLVED: 'game:undoResolved',
+
+  PROFILE_DATA: 'profile:data',
+  PROFILE_ERROR: 'profile:error',
+
+  ACHIEVEMENTS_LIST: 'achievements:list',
+  ACHIEVEMENTS_UNLOCKED: 'achievements:unlocked',
 };
