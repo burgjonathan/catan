@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { dbLoad, dbSave } from './dataStore.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_FILE = path.join(__dirname, '..', 'achievements_data.json');
@@ -24,7 +25,7 @@ const ACHIEVEMENT_DEFS = [
 let playerAchievements = {}; // sessionId -> [{ id, unlockedAt }]
 let playerStats = {};        // sessionId -> { totalWins, totalKnights }
 
-function loadData() {
+function loadFromFile() {
   try {
     if (fs.existsSync(DATA_FILE)) {
       const raw = fs.readFileSync(DATA_FILE, 'utf8');
@@ -38,18 +39,26 @@ function loadData() {
 }
 
 function saveData() {
+  const data = { playerAchievements, playerStats };
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify({
-      playerAchievements,
-      playerStats,
-    }, null, 2));
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
   } catch {
     // Silent fail for persistence
   }
+  dbSave('achievements', data);
 }
 
 // Initialize on import
-loadData();
+loadFromFile();
+
+export async function initAchievements() {
+  const data = await dbLoad('achievements');
+  if (data) {
+    playerAchievements = data.playerAchievements || {};
+    playerStats = data.playerStats || {};
+    console.log('Achievements loaded from database');
+  }
+}
 
 function ensurePlayer(sessionId) {
   if (!playerAchievements[sessionId]) playerAchievements[sessionId] = [];
@@ -104,8 +113,6 @@ export function checkAchievements(state, sessionId, playerId) {
   }
 
   // 2. Lone Wolf - win without trading with other players
-  // We check if player has no completed trades recorded in state
-  // Since there's no direct trade tracking, we look at the game log
   if (didWin) {
     const playerTraded = (state.gameLog || []).some(log => {
       const msg = typeof log === 'string' ? log : (log.message || '');
@@ -152,16 +159,12 @@ export function checkAchievements(state, sessionId, playerId) {
   }
 
   // 10. Hoarder - hold 15+ resources at once
-  // Check current resources (end of game state)
   const totalResources = Object.values(player.resources || {}).reduce((a, b) => a + b, 0);
   if (totalResources >= 15) {
     unlock(sessionId, 'max_resources', newlyUnlocked);
   }
 
   // 11. Comeback King - win after being last in VP at some point
-  // We approximate: if winner had the lowest VP among non-bot players at some earlier stage
-  // Since we only have final state, check if winner had fewest settlements early (heuristic)
-  // Better: check if winner currently has the least non-bonus VP compared to others
   if (didWin) {
     const myBaseVP = player.settlements.length + player.cities.length * 2;
     const othersBaseVP = state.players

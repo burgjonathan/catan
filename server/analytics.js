@@ -1,14 +1,15 @@
-// Analytics tracker with file persistence
+// Analytics tracker with file + database persistence
 // Tracks: visits, active users, play time per session
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { dbLoad, dbSave } from './dataStore.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_FILE = path.join(__dirname, '..', 'analytics_data.json');
 
-function loadData() {
+function loadFromFile() {
   try {
     const raw = fs.readFileSync(DATA_FILE, 'utf-8');
     const data = JSON.parse(raw);
@@ -33,9 +34,10 @@ function saveData() {
   } catch (err) {
     console.error('Failed to save analytics data:', err.message);
   }
+  dbSave('analytics', data);
 }
 
-const saved = loadData();
+const saved = loadFromFile();
 
 const analytics = {
   totalVisits: saved ? saved.totalVisits : 0,
@@ -43,6 +45,16 @@ const analytics = {
   sessions: saved ? saved.sessions : new Map(),
   startedAt: saved ? saved.startedAt : Date.now(),
 };
+
+export async function initAnalytics() {
+  const data = await dbLoad('analytics');
+  if (data) {
+    analytics.totalVisits = data.totalVisits || 0;
+    analytics.sessions = new Map(Object.entries(data.sessions || {}));
+    analytics.startedAt = data.startedAt || Date.now();
+    console.log('Analytics loaded from database');
+  }
+}
 
 export function trackConnect(socketId, sessionId, ip, userAgent) {
   analytics.totalVisits++;

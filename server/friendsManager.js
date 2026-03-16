@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { dbLoad, dbSave } from './dataStore.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_FILE = path.join(__dirname, '..', 'friends_data.json');
@@ -26,7 +27,7 @@ function generateFriendCode() {
   return code;
 }
 
-function loadData() {
+function loadFromFile() {
   try {
     if (fs.existsSync(DATA_FILE)) {
       const raw = fs.readFileSync(DATA_FILE, 'utf8');
@@ -44,22 +45,37 @@ function loadData() {
 }
 
 function saveData() {
+  const data = {
+    friendCodes,
+    codesToSession,
+    friendLists,
+    playerNames,
+    playerAvatars,
+    nameLockedUntil
+  };
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify({
-      friendCodes,
-      codesToSession,
-      friendLists,
-      playerNames,
-      playerAvatars,
-      nameLockedUntil
-    }, null, 2));
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
   } catch {
     // Silent fail for persistence
   }
+  dbSave('friends', data);
 }
 
 // Initialize on import
-loadData();
+loadFromFile();
+
+export async function initFriends() {
+  const data = await dbLoad('friends');
+  if (data) {
+    friendCodes = data.friendCodes || {};
+    codesToSession = data.codesToSession || {};
+    friendLists = data.friendLists || {};
+    playerNames = data.playerNames || {};
+    playerAvatars = data.playerAvatars || {};
+    nameLockedUntil = data.nameLockedUntil || {};
+    console.log('Friends data loaded from database');
+  }
+}
 
 export function ensureFriendCode(sessionId, name) {
   if (!sessionId) return null;

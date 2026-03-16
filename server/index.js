@@ -7,7 +7,10 @@ import crypto from 'crypto';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { registerSocketHandlers } from './socketHandlers.js';
-import { getStats } from './analytics.js';
+import { getStats, initAnalytics } from './analytics.js';
+import { initAchievements } from './achievements.js';
+import { initFriends } from './friendsManager.js';
+import { initDb, dbLoad, dbSave } from './dataStore.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ADMIN_TOKENS_FILE = path.join(__dirname, '..', 'admin_tokens.json');
@@ -24,10 +27,13 @@ function loadAdminTokens() {
 }
 
 function saveAdminTokens() {
-  fs.writeFileSync(ADMIN_TOKENS_FILE, JSON.stringify({
-    tokens: [...adminTokens],
-    claimed: setupClaimed,
-  }), 'utf-8');
+  const data = { tokens: [...adminTokens], claimed: setupClaimed };
+  try {
+    fs.writeFileSync(ADMIN_TOKENS_FILE, JSON.stringify(data), 'utf-8');
+  } catch {
+    // Silent fail
+  }
+  dbSave('admin_tokens', data);
 }
 
 const savedAdmin = loadAdminTokens();
@@ -36,6 +42,15 @@ if (process.env.ADMIN_TOKEN) {
   adminTokens.add(process.env.ADMIN_TOKEN);
 }
 let setupClaimed = savedAdmin.claimed || !!process.env.ADMIN_TOKEN;
+
+async function initAdminTokens() {
+  const data = await dbLoad('admin_tokens');
+  if (data) {
+    (data.tokens || []).forEach(t => adminTokens.add(t));
+    if (data.claimed) setupClaimed = true;
+    console.log('Admin tokens loaded from database');
+  }
+}
 
 const app = express();
 app.use(cors());
@@ -79,7 +94,15 @@ const io = new Server(httpServer, {
 
 registerSocketHandlers(io);
 
-const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => {
-  console.log(`Catan server listening on port ${PORT}`);
-});
+// Initialize database and load persisted data before starting
+async function start() {
+  await initDb();
+  await Promise.all([initAnalytics(), initAchievements(), initFriends(), initAdminTokens()]);
+
+  const PORT = process.env.PORT || 3001;
+  httpServer.listen(PORT, () => {
+    console.log(`Catan server listening on port ${PORT}`);
+  });
+}
+
+start();
