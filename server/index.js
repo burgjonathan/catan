@@ -4,19 +4,38 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
 import crypto from 'crypto';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { registerSocketHandlers } from './socketHandlers.js';
 import { getStats } from './analytics.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ADMIN_TOKENS_FILE = path.join(__dirname, '..', 'admin_tokens.json');
 
 // Admin tokens that are allowed to access analytics
-// The first person to visit ?admin-setup gets a token, or set ADMIN_TOKEN env var
-const adminTokens = new Set();
+// Persisted to file so they survive restarts
+function loadAdminTokens() {
+  try {
+    const data = JSON.parse(fs.readFileSync(ADMIN_TOKENS_FILE, 'utf-8'));
+    return { tokens: new Set(data.tokens || []), claimed: data.claimed || false };
+  } catch {
+    return { tokens: new Set(), claimed: false };
+  }
+}
+
+function saveAdminTokens() {
+  fs.writeFileSync(ADMIN_TOKENS_FILE, JSON.stringify({
+    tokens: [...adminTokens],
+    claimed: setupClaimed,
+  }), 'utf-8');
+}
+
+const savedAdmin = loadAdminTokens();
+const adminTokens = savedAdmin.tokens;
 if (process.env.ADMIN_TOKEN) {
   adminTokens.add(process.env.ADMIN_TOKEN);
 }
-let setupClaimed = !!process.env.ADMIN_TOKEN;
+let setupClaimed = savedAdmin.claimed || !!process.env.ADMIN_TOKEN;
 
 const app = express();
 app.use(cors());
@@ -30,6 +49,7 @@ app.post('/api/admin/setup', (req, res) => {
   const token = crypto.randomUUID();
   adminTokens.add(token);
   setupClaimed = true;
+  saveAdminTokens();
   console.log('Admin token claimed');
   res.json({ token });
 });

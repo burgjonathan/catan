@@ -1,15 +1,47 @@
-// In-memory analytics tracker
+// Analytics tracker with file persistence
 // Tracks: visits, active users, play time per session
 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DATA_FILE = path.join(__dirname, '..', 'analytics_data.json');
+
+function loadData() {
+  try {
+    const raw = fs.readFileSync(DATA_FILE, 'utf-8');
+    const data = JSON.parse(raw);
+    return {
+      totalVisits: data.totalVisits || 0,
+      sessions: new Map(Object.entries(data.sessions || {})),
+      startedAt: data.startedAt || Date.now(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveData() {
+  const data = {
+    totalVisits: analytics.totalVisits,
+    sessions: Object.fromEntries(analytics.sessions),
+    startedAt: analytics.startedAt,
+  };
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data), 'utf-8');
+  } catch (err) {
+    console.error('Failed to save analytics data:', err.message);
+  }
+}
+
+const saved = loadData();
+
 const analytics = {
-  // Total page visits (each socket connection = 1 visit)
-  totalVisits: 0,
-  // { socketId: { sessionId, connectedAt, ip, userAgent } }
+  totalVisits: saved ? saved.totalVisits : 0,
   activeUsers: new Map(),
-  // { sessionId: { firstSeen, lastSeen, totalTime, visits, gamesPlayed, currentGameStart } }
-  sessions: new Map(),
-  // Server start time
-  startedAt: Date.now(),
+  sessions: saved ? saved.sessions : new Map(),
+  startedAt: saved ? saved.startedAt : Date.now(),
 };
 
 export function trackConnect(socketId, sessionId, ip, userAgent) {
@@ -37,6 +69,7 @@ export function trackConnect(socketId, sessionId, ip, userAgent) {
   }
   session.visits++;
   session.lastSeen = Date.now();
+  saveData();
 }
 
 export function trackDisconnect(socketId) {
@@ -55,6 +88,7 @@ export function trackDisconnect(socketId) {
   }
 
   analytics.activeUsers.delete(socketId);
+  saveData();
 }
 
 export function trackGameStart(sessionId) {
@@ -62,6 +96,7 @@ export function trackGameStart(sessionId) {
   if (session) {
     session.gamesPlayed++;
     session.currentGameStart = Date.now();
+    saveData();
   }
 }
 
