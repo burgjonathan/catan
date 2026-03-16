@@ -222,6 +222,9 @@ export function registerSocketHandlers(io) {
 
     socket.on(C2S.CREATE_ROOM, ({ playerName, sessionId }) => {
       try {
+        if (friendsManager.isNameTaken(playerName, sessionId)) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'This name is already taken' });
+        }
         const { code, room } = roomManager.createRoom(socket.id, playerName, sessionId);
         socket.join(code);
         socket.emit(S2C.ROOM_CREATED, {
@@ -236,6 +239,9 @@ export function registerSocketHandlers(io) {
 
     socket.on(C2S.JOIN_ROOM, ({ code, playerName, sessionId }) => {
       try {
+        if (friendsManager.isNameTaken(playerName, sessionId)) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'This name is already taken' });
+        }
         const upperCode = code.toUpperCase();
         const { room } = roomManager.joinRoom(upperCode, socket.id, playerName, sessionId);
         socket.join(upperCode);
@@ -297,6 +303,9 @@ export function registerSocketHandlers(io) {
         if (!playerName || !playerName.trim()) {
           return socket.emit(S2C.ROOM_ERROR, { message: 'Player name is required' });
         }
+        if (friendsManager.isNameTaken(playerName.trim(), sessionId)) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'This name is already taken' });
+        }
         if (!botCount || botCount < 1 || botCount > 5) {
           return socket.emit(S2C.ROOM_ERROR, { message: 'Bot count must be 1-5' });
         }
@@ -339,6 +348,9 @@ export function registerSocketHandlers(io) {
         if (roomManager.getRoomBySocket(socket.id)) {
           return socket.emit(S2C.ROOM_ERROR, { message: 'Already in a room' });
         }
+        if (friendsManager.isNameTaken(playerName.trim(), sessionId)) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'This name is already taken' });
+        }
         const { code, room } = roomManager.createPublicRoom(socket.id, playerName.trim(), sessionId);
         socket.join(code);
         socket.leave('lobby:browser');
@@ -368,6 +380,9 @@ export function registerSocketHandlers(io) {
       try {
         if (!playerName || !playerName.trim()) {
           return socket.emit(S2C.ROOM_ERROR, { message: 'Player name is required' });
+        }
+        if (friendsManager.isNameTaken(playerName.trim(), sessionId)) {
+          return socket.emit(S2C.ROOM_ERROR, { message: 'This name is already taken' });
         }
         if (roomManager.getRoomBySocket(socket.id)) {
           return socket.emit(S2C.ROOM_ERROR, { message: 'Already in a room' });

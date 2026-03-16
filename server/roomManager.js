@@ -95,7 +95,6 @@ export function joinRoom(code, socketId, playerName, sessionId) {
   const maxPlayers = room.isPublic ? 4 : 6;
   if (room.players.length >= maxPlayers) throw new Error('Room is full');
   if (room.players.some(p => p.id === socketId)) throw new Error('Already in room');
-
   const colorIndex = room.players.length;
   const avatar = sessionId ? friendsManager.getAvatar(sessionId) : null;
   room.players.push({

@@ -80,8 +80,8 @@ export async function initFriends() {
 export function ensureFriendCode(sessionId, name) {
   if (!sessionId) return null;
   if (friendCodes[sessionId]) {
-    // Update name if changed
-    if (name && playerNames[sessionId] !== name) {
+    // Update name if changed (only if not taken)
+    if (name && playerNames[sessionId] !== name && !isNameTaken(name, sessionId)) {
       playerNames[sessionId] = name;
       saveData();
     }
@@ -90,7 +90,7 @@ export function ensureFriendCode(sessionId, name) {
   const code = generateFriendCode();
   friendCodes[sessionId] = code;
   codesToSession[code] = sessionId;
-  if (name) playerNames[sessionId] = name;
+  if (name && !isNameTaken(name, sessionId)) playerNames[sessionId] = name;
   if (!friendLists[sessionId]) friendLists[sessionId] = [];
   saveData();
   return code;
@@ -151,7 +151,7 @@ export function getFriendsList(sessionId) {
 
 export function setOnline(sessionId, socketId, name) {
   onlinePlayers.set(sessionId, { socketId, name, status: 'online', roomCode: null });
-  if (name) {
+  if (name && !isNameTaken(name, sessionId)) {
     playerNames[sessionId] = name;
     saveData();
   }
@@ -185,6 +185,15 @@ export function getSessionIdBySocketId(socketId) {
   return null;
 }
 
+export function isNameTaken(name, excludeSessionId) {
+  if (!name) return false;
+  const lower = name.toLowerCase();
+  for (const [sid, n] of Object.entries(playerNames)) {
+    if (sid !== excludeSessionId && n.toLowerCase() === lower) return true;
+  }
+  return false;
+}
+
 export function setProfile(sessionId, name, avatar) {
   // Check if name is locked
   if (nameLockedUntil[sessionId] && Date.now() < nameLockedUntil[sessionId]) {
@@ -192,8 +201,11 @@ export function setProfile(sessionId, name, avatar) {
       return { error: 'Name locked', lockedUntil: nameLockedUntil[sessionId] };
     }
   }
-  // Set name and lock it for 20 days
+  // Check if name is already taken by another player
   if (name && name !== playerNames[sessionId]) {
+    if (isNameTaken(name, sessionId)) {
+      return { error: 'This name is already taken' };
+    }
     playerNames[sessionId] = name;
     nameLockedUntil[sessionId] = Date.now() + 20 * 24 * 60 * 60 * 1000;
   }
